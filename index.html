@@ -20,6 +20,9 @@
             --morandi-dusty-pink: #B5838D; 
             --morandi-haze-blue: #78909C; /* 莫蘭迪霧霾藍 */
             --morandi-denim-blue: #5D7A8C; /* 莫蘭迪牛仔藍 */
+            --morandi-silver-grey: #E2E5E7; /* 莫蘭迪銀灰色 */
+            --morandi-slate-grey: #4A4E52; /* 莫蘭迪石墨灰 */
+            --morandi-grey-blue: #5E6D79; /* 莫蘭迪灰藍色 */
             --m-board-size: 92vw; 
         }
 
@@ -56,7 +59,23 @@
         input[type="text"], select { height: 45px; padding: 0 5px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 16px; width: 100%; box-sizing: border-box; background-color: white; font-family: inherit; }
         .options-row { display: flex; gap: 10px; margin: 10px 0 15px 0; align-items: center; }
         .checkbox-item { display: flex; align-items: center; gap: 4px; font-size: 15px; font-weight: bold; cursor: pointer; }
-        #multiNotice { display: none; color: #fdfdfd; font-size: 15px; font-weight: bold; margin: 20px 0; line-height: 1.6; background: var(--cold-rock-grey); padding: 15px; border-radius: 12px; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1), 2px 2px 8px rgba(0,0,0,0.05); border: 1px solid #8A979F; }
+        
+        /* 提示通知區塊優化 */
+        #multiNotice { 
+            display: none; 
+            color: var(--morandi-grey-blue); 
+            font-size: 15px; 
+            font-weight: bold; 
+            margin: 20px 0; 
+            line-height: 1.6; 
+            background: var(--morandi-silver-grey); 
+            padding: 15px; 
+            border-radius: 12px; 
+            border: 2px solid var(--morandi-slate-grey);
+            box-shadow: 2px 4px 10px rgba(0,0,0,0.1); 
+            text-align: center;
+        }
+
         .btn-start { width: 100%; height: 52px; background: var(--dark-navy-grey); color: white; border: none; border-radius: 12px; font-size: 19px; font-weight: bold; cursor: pointer; margin-top: 10px; }
 
         /* --- 命盤結果區 --- */
@@ -137,7 +156,10 @@
         <label style="font-weight: bold; font-size: 16px; color: var(--graphite-gray);">排行</label>
         <select id="birthOrder" style="margin-top: 5px;"><option value="1">第一胎</option><option value="2">第二胎</option><option value="3">第三胎</option><option value="4">第四胎</option><option value="5">第五胎</option></select>
     </div>
-    <div id="multiNotice">＊ 若非第一胎，除了性別可更改之外，<br>請輸入第一胎的出生時間，以免排盤不準確。</div>
+    <div id="multiNotice">
+        ＊若非第一胎 除了性別可更改之外<br>
+        請輸入第一胎的出生時間 以免排盤不準確
+    </div>
     <button class="btn-start" onclick="renderBoard()">開始排盤</button>
 </div>
 
@@ -232,7 +254,6 @@
         const displayName = uName.trim() === "" ? "命主" : uName;
         document.getElementById('c-row2').innerHTML = `<span>${displayName}</span><span>${genderFull}</span><span>${["","","水二局","木三局","金四局","土五局","火六局"][juNum]}</span>`;
         
-        // 移除冒號，改為空格
         document.getElementById('c-dates').innerHTML = `
             <div class="date-line"><span class="date-label">國曆 </span><span>${solar.getYear()}年${solar.getMonth()}月${solar.getDay()}日 ${hIn}:${mIn}</span></div>
             <div class="date-line"><span class="date-label">農曆 </span><span>${lunar.getYearInGanZhi()}年${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}日${ZHI[hIdx]}時</span></div>
