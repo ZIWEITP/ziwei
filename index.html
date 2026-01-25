@@ -17,108 +17,49 @@
             --dark-navy-grey: #3A4652; 
             --lilac-purple: #8A7B9C;
             --morandi-dusty-pink: #B5838D; 
-            --morandi-slate-grey: #4A4E52; /* 正式版用這個 */
+            --morandi-denim-blue: #5D7A8C;
+            --morandi-slate-grey: #4A4E52; /* 正式版用色 */
             --m-board-size: clamp(350px, 92vw, 700px); 
         }
 
-        body { 
-            font-family: 'Noto Sans TC', sans-serif; 
-            background: #f0f2f5; 
-            margin: 0; 
-            padding: 15px 5px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-        }
+        body { font-family: 'Noto Sans TC', sans-serif; background: #f0f2f5; margin: 0; padding: 15px 5px; display: flex; flex-direction: column; align-items: center; }
 
-        /* 導覽列 */
-        .nav-header { width: 100%; max-width: 480px; display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
-        .nav-link { text-decoration: none; color: #5E6D79; font-weight: bold; font-size: 14px; padding: 5px 12px; background: #E2E5E7; border-radius: 20px; }
+        .nav-header { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .nav-link { text-decoration: none; color: #5E6D79; font-weight: bold; font-size: 14px; padding: 6px 16px; background: #E2E5E7; border-radius: 20px; transition: 0.3s; }
+        .nav-link.active { background: #5E6D79; color: white; }
 
-        /* --- 修復後的輸入面板樣式 --- */
-        .control-panel { 
-            background: white; padding: 30px 25px; border-radius: 20px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 95%; 
-            max-width: 480px; box-sizing: border-box;
-            font-family: 'cwTeXFangSong', serif;
-        }
+        /* 輸入面板 */
+        .control-panel { background: white; padding: 30px 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 95%; max-width: 480px; box-sizing: border-box; font-family: 'cwTeXFangSong', serif; }
         .panel-title { text-align: center; margin: 0 0 25px 0; color: var(--dark-navy-grey); font-size: 28px; font-weight: bold; }
         
-        .input-row { display: flex; gap: 15px; margin-bottom: 20px; width: 100%; }
+        .input-row { display: flex; gap: 12px; margin-bottom: 15px; width: 100%; }
         .input-group { display: flex; flex-direction: column; flex: 1; }
-        .input-group label { font-size: 16px; font-weight: bold; margin-bottom: 8px; color: var(--graphite-gray); }
+        .input-group label { font-size: 15px; font-weight: bold; margin-bottom: 6px; color: var(--graphite-gray); }
         
-        input[type="text"], select { 
-            height: 48px; 
-            border: 1.5px solid #d1d5db; 
-            border-radius: 10px; 
-            font-size: 16px; 
-            padding: 0 12px; 
-            width: 100%; 
-            box-sizing: border-box;
-            outline: none;
-        }
-        input[type="text"]:focus { border-color: var(--morandi-blue); }
+        input[type="text"], select { height: 45px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 15px; padding: 0 10px; width: 100%; box-sizing: border-box; outline: none; }
+        
+        /* 選項區塊樣式 */
+        .options-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px; margin-bottom: 20px; padding-top: 10px; border-top: 1px inset #f0f0f0; }
+        .checkbox-item { display: flex; align-items: center; font-size: 14px; color: var(--graphite-gray); cursor: pointer; }
+        .checkbox-item input { margin-right: 5px; }
 
-        .btn-start { 
-            width: 100%; height: 55px; background: var(--dark-navy-grey); 
-            color: white; border: none; border-radius: 12px; 
-            font-size: 19px; font-weight: bold; cursor: pointer; 
-            margin-top: 10px;
-            transition: background 0.3s;
-        }
-        .btn-start:hover { background: #2c353f; }
+        .btn-start { width: 100%; height: 52px; background: var(--dark-navy-grey); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 5px; }
 
-        /* --- 命盤顯示部分 --- */
+        /* 命盤顯示部分 */
         #result-container { display: none; width: 100%; }
-        .grid-container { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            grid-template-rows: repeat(4, auto); 
-            background: var(--morandi-blue); 
-            border: 2px solid var(--morandi-blue); 
-            width: var(--m-board-size);
-            margin: 0 auto;
-            gap: 1px;
-        }
-        .cell { 
-            background: #fff; 
-            position: relative; 
-            aspect-ratio: 1 / 1.35; 
-            display: flex;
-            flex-direction: column;
-            padding: 4px;
-            box-sizing: border-box;
-        }
+        .grid-container { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, auto); background: var(--morandi-blue); border: 2px solid var(--morandi-blue); width: var(--m-board-size); margin: 0 auto; gap: 1px; }
+        .cell { background: #fff; position: relative; aspect-ratio: 1 / 1.35; display: flex; flex-direction: column; padding: 4px; box-sizing: border-box; }
         
-        .gan-zhi-label { 
-            position: absolute; 
-            bottom: 4px; 
-            right: 4px; 
-            /* 這裡自行根據版本切換 --morandi-slate-grey 或 --morandi-haze-blue */
-            color: var(--morandi-slate-grey); 
-            font-size: clamp(12px, 3.8vw, 18px); 
-            font-weight: 900; 
-            display: flex; 
-            flex-direction: column; 
-            line-height: 1; 
-            text-align: center;
-        }
+        .gan-zhi-label { position: absolute; bottom: 4px; right: 4px; font-size: clamp(12px, 3.8vw, 18px); font-weight: 900; display: flex; flex-direction: column; line-height: 1; text-align: center; }
+        /* 正式版預設石墨灰，備用版請手動改為 var(--morandi-haze-blue) */
+        .gan-zhi-label { color: var(--morandi-slate-grey); }
 
         .star-container { display: flex; flex-direction: row; gap: 2px; }
         .star-item { display: flex; flex-direction: column; align-items: center; }
         .star-name { font-family: 'Noto Serif TC', serif; font-size: clamp(14px, 3.8vw, 20px); font-weight: 900; color: var(--graphite-gray); writing-mode: vertical-rl; }
         
-        .center-box { 
-            grid-column: 2 / 4; grid-row: 2 / 4; background: #fff; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            padding: 15px; text-align: center; 
-        }
-
+        .center-box { grid-column: 2 / 4; grid-row: 2 / 4; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; text-align: center; }
         .palace-name { position: absolute; bottom: 4px; left: 4px; font-size: clamp(14px, 4vw, 18px); font-weight: 900; background: var(--palace-bg); color: var(--palace-text); width: 22%; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
-        
-        .sihua-tag { font-size: 10px; padding: 1px; border-radius: 2px; color: white; margin-top: 1px; }
-        .sihua-祿 { background-color: #2D6A4F; } .sihua-權 { background-color: #6A4C93; } .sihua-科 { background-color: #1976D2; } .sihua-忌 { background-color: #D62828; }
 
         @media (min-width: 768px) { :root { --m-board-size: 680px; } }
     </style>
@@ -126,37 +67,58 @@
 <body>
 
 <div class="nav-header">
-    <a href="index.html" class="nav-link">正式版</a>
+    <a href="index.html" class="nav-link active">正式版</a>
     <a href="zwindex.html" class="nav-link">備用版</a>
 </div>
 
 <div class="control-panel" id="input-page">
     <div class="panel-title">宮廷紫微斗數排盤</div>
+    
     <div class="input-row">
-        <div class="input-group"><label>姓名</label><input type="text" id="uName" placeholder="輸入姓名"></div>
-        <div class="input-group"><label>性別</label><select id="gender"><option value="">選擇</option><option value="男">男</option><option value="女">女</option></select></div>
+        <div class="input-group">
+            <label>姓名</label>
+            <input type="text" id="uName" placeholder="輸入姓名">
+        </div>
+        <div class="input-group">
+            <label>性別</label>
+            <select id="gender">
+                <option value="">選擇</option>
+                <option value="男">男</option>
+                <option value="女">女</option>
+            </select>
+        </div>
     </div>
+
     <div class="input-row">
-        <div class="input-group" style="flex:1.5"><label>出生日期</label><input type="text" id="bDate" maxlength="8" placeholder="YYYYMMDD"></div>
-        <div class="input-group"><label>時</label><input type="text" id="bHour" placeholder="00"></div> <div class="input-group"><label>分</label><input type="text" id="bHour" placeholder="00"></div>
+        <div class="input-group" style="flex: 2;">
+            <label>出生日期</label>
+            <input type="text" id="bDate" maxlength="8" placeholder="YYYYMMDD">
+        </div>
+        <div class="input-group">
+            <label>時</label>
+            <input type="text" id="bHour" placeholder="00">
+        </div>
+        <div class="input-group">
+            <label>分</label>
+            <input type="text" id="bMin" placeholder="00">
+        </div>
     </div>
-     </div>
-    <div class="bottom-row">
-        <div class="bottom-main">
-            <div class="options-wrap">
-                <label class="checkbox-item"><input type="checkbox" id="isLeap"><span>閏月</span></label>
-                <label class="checkbox-item"><input type="checkbox" id="isDST"><span>日光節約</span></label>
-                <label class="checkbox-item"><input type="checkbox" id="hasMulti" onchange="toggleMulti()"><span>雙胞胎/多胞胎</span></label>
-                <div id="multiSelectGroup" style="display: none; width: 120px;">
-                    <select id="birthOrder">
-                        <option value="1">第一胎</option>
-                        <option value="2">第二胎</option>
-                        <option value="3">第三胎</option>
-                        <option value="4">第四胎</option>
-                        <option value="5">第五胎</option>
-                    </select>
-                </div>
-            </div>
+
+    <div class="options-container">
+        <label class="checkbox-item"><input type="checkbox" id="leapMonth"> 閏月</label>
+        <label class="checkbox-item"><input type="checkbox" id="dst"> 日光節約</label>
+        <div class="input-group" style="flex: row; align-items: center; gap: 5px;">
+            <span style="font-size: 14px; color: var(--graphite-gray); white-space: nowrap;">雙胞胎/多胞胎</span>
+            <select id="twinOrder" style="height: 30px; font-size: 13px; width: 85px;">
+                <option value="1">第一胎</option>
+                <option value="2">第二胎</option>
+                <option value="3">第三胎</option>
+                <option value="4">第四胎</option>
+                <option value="5">第五胎</option>
+            </select>
+        </div>
+    </div>
+
     <button class="btn-start" onclick="renderBoard()">開始排盤</button>
 </div>
 
@@ -166,18 +128,18 @@
         <div class="cell" id="cell-辰" style="grid-area:2/1"></div>
         <div id="info" class="center-box">
             <div style="font-size:clamp(16px, 4.5vw, 22px); font-weight:bold; color:var(--morandi-denim-blue)">唐朝宮廷命理研究院</div>
-            <div id="c-row2" style="margin:12px 0; color:var(--morandi-dusty-pink); font-weight:bold; font-size:clamp(14px, 3.8vw, 18px);"></div>
-            <div id="c-dates" style="font-size:clamp(11px, 3.1vw, 15px); color:var(--lilac-purple); line-height:1.6; text-align: center;"></div>
+            <div id="c-row2" style="margin:8px 0; color:var(--morandi-dusty-pink); font-weight:bold; font-size:clamp(14px, 3.8vw, 18px);"></div>
+            <div id="c-dates" style="font-size:clamp(11px, 3.1vw, 15px); color:var(--lilac-purple); line-height:1.5;"></div>
         </div>
         <div class="cell" id="cell-酉" style="grid-area:2/4"></div>
         <div class="cell" id="cell-卯" style="grid-area:3/1"></div><div class="cell" id="cell-戌" style="grid-area:3/4"></div>
         <div class="cell" id="cell-寅" style="grid-area:4/1"></div><div class="cell" id="cell-丑" style="grid-area:4/2"></div><div class="cell" id="cell-子" style="grid-area:4/3"></div><div class="cell" id="cell-亥" style="grid-area:4/4"></div>
     </div>
-    <div style="text-align:center; margin-top:30px;"><button onclick="location.reload()" style="padding:10px 25px; border-radius:8px; border:none; background:#e2e5e7; cursor:pointer; font-weight:bold;">返回重新輸入</button></div>
+    <div style="text-align:center; margin-top:20px;"><button onclick="location.reload()" style="padding:10px 20px; border-radius:8px; border:none; background:#e2e5e7; cursor:pointer;">返回重新輸入</button></div>
 </div>
 
 <script>
-    // ... 此處貼上您之前的 JavaScript 代碼 ...
+    // JavaScript 部分保持不變，如需處理「分」或「多胞胎」邏輯可再行擴充
     const ZHI = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
     const GAN = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
     const PALACES = ["命", "兄", "夫", "子", "財", "疾", "遷", "友", "官", "田", "福", "父"]; 
@@ -213,7 +175,7 @@
         const yGan = lunar.getYearGan(); currentYearGan = yGan;
         const hIdx = Math.floor(((parseInt(hIn)+1)%24)/2);
         const baseMIdx = (2 + (lunar.getMonth()-1) - hIdx + 12) % 12;
-        const wuHu = {"甲":"丙","己":"丙","乙":"戊","庚":"戊","丙":"庚","辛":"庚","丁":"壬","壬":"壬","戊":"甲","癸":"甲"};
+        const wuHu = {"甲":"丙","己":"丙","乙":"戊","庚":"戊","丙":"技術","辛":"庚","丁":"壬","壬":"壬","戊":"甲","癸":"甲"};
         let baseStartGanIdx = GAN.indexOf(wuHu[yGan]);
         let baseMGan = GAN[(baseStartGanIdx + (baseMIdx >= 2 ? baseMIdx-2 : baseMIdx+10)) % 10];
         let juNum = getJu(baseMGan, ZHI[baseMIdx]);
