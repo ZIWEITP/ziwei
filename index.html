@@ -17,7 +17,7 @@
             --dark-navy-grey: #3A4652; 
             --lilac-purple: #8A7B9C;
             --cold-rock-grey: #9EABB3;
-            --morandi-dusty-pink: #B5838D; /* 莫蘭迪煙粉色 */
+            --morandi-dusty-pink: #B5838D; 
             --m-board-size: 92vw; 
         }
 
@@ -75,7 +75,6 @@
         .sihua-tag { font-size: 3vw; padding: 1px 2px; border-radius: 2px; color: white; margin-top: 2px; line-height: 1; }
         .sihua-祿 { background-color: #2D6A4F; } .sihua-權 { background-color: #6A4C93; } .sihua-科 { background-color: #1976D2; } .sihua-忌 { background-color: #D62828; }
         
-        /* 中宮內容調整 */
         .center-box { 
             grid-column: 2 / 4; grid-row: 2 / 4; background: #fff; 
             display: flex; flex-direction: column; justify-content: flex-start; 
@@ -87,13 +86,13 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.15); 
         }
         .c-info { 
-            font-size: 3.8vw; display: flex; gap: 10px; font-weight: bold; 
-            color: var(--morandi-dusty-pink); /* 煙粉色 */
+            font-size: 3.8vw; display: flex; gap: 8px; font-weight: bold; 
+            color: var(--morandi-dusty-pink); 
             margin-bottom: 10px; 
         }
-        .date-info { font-size: 3.2vw; color: var(--lilac-purple); line-height: 1.5; text-align: left; width: 92%; }
-        .date-line { display: flex; justify-content: flex-start; margin-bottom: 2px; }
-        .date-label { width: 42px; flex-shrink: 0; }
+        .date-info { font-size: 3.1vw; color: var(--lilac-purple); line-height: 1.5; text-align: left; width: 94%; }
+        .date-line { display: flex; justify-content: flex-start; margin-bottom: 2px; white-space: nowrap; }
+        .date-label { width: 38px; flex-shrink: 0; }
 
         .palace-name { position: absolute; bottom: 3px; left: 3px; font-size: 4vw; font-weight: 900; background: var(--palace-bg); width: 7.5vw; height: 7.5vw; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
         .daxian-container { position: absolute; bottom: 10vw; left: 50%; transform: translateX(-50%); }
@@ -107,8 +106,9 @@
             .star-name { font-size: 18px; }
             .palace-name { font-size: 18px; width: 38px; height: 38px; }
             .c-title { font-size: 22px; }
-            .c-info { font-size: 18px; }
-            .date-info { font-size: 15px; }
+            .c-info { font-size: 17px; }
+            .date-info { font-size: 14px; }
+            .date-label { width: 45px; }
         }
     </style>
 </head>
@@ -160,7 +160,7 @@
     const GAN = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
     const PALACES = ["命", "兄", "夫", "子", "財", "疾", "遷", "友", "官", "田", "福", "父"]; 
     const ZIWEI_TABLE = { 2: ["丑","寅","寅","卯","卯","辰","辰","巳","巳","午","午","未","未","申","申","酉","酉","戌","戌","亥","亥","子","子","丑","丑","寅","寅","卯","卯","辰"], 3: ["辰","丑","寅","巳","寅","卯","午","卯","辰","未","辰","巳","申","巳","午","酉","午","未","戌","未","申","亥","申","酉","子","酉","戌","丑","戌","亥"], 4: ["亥","辰","丑","寅","子","巳","寅","卯","丑","午","卯","辰","寅","未","辰","巳","卯","申","巳","午","辰","酉","午","未","巳","戌","未","申","午","亥"], 5: ["午","亥","辰","丑","寅","未","子","巳","寅","卯","申","丑","午","卯","辰","酉","寅","未","辰","巳","戌","卯","申","巳","午","亥","辰","酉","午","未"], 6: ["酉","午","亥","辰","丑","寅","戌","未","子","巳","寅","卯","亥","申","丑","午","卯","辰","子","酉","寅","未","辰","巳","丑","戌","卯","申","巳","午"] };
-    const SI_HUA_MAP = { "甲": {"廉貞":"祿", "破軍":"權", "武曲":"科", "太陽":"忌"}, "乙": {"天機":"祿", "天梁":"權", "紫微":"科", "太陰":"忌"}, "丙": {"天同":"祿", "天機":"權", "文昌":"科", "廉貞":"忌"}, "丁": {"太陰":"祿", "天同":"權", "天機":"科", "巨門":"忌"}, "戊": {"貪狼":"祿", "太陰":"權", "右弼":"科", "天機":"忌"}, "己": {"武曲":"祿", "貪狼":"權", "天梁":"科", "文曲":"忌"}, "庚": {"太陽":"祿", "武曲":"權", "太陰":"科", "天同":"忌"}, "辛": {"巨門":"祿", "太陽":"權", "文曲":"科", "文昌":"忌"}, "壬": {"天梁":"祿", "紫微":"權", "左輔":"科", "武曲":"忌"}, "癸": {"破軍":"祿", "巨門":"權", "太陰":"科", "貪狼":"忌"} };
+    const SI_HUA_MAP = { "甲": {"廉貞":"祿", "破軍":"權", "武曲":"科", "太陽":"忌"}, "乙": {"天機":"祿", "天梁":"權", "紫微":"科", "太陰":"忌"}, "丙": {"天同":"祿", "天機":"權", "文昌":"科", "廉貞":"忌"}, "丁": {"太陰":"祿", "天同":"權", "天機":"科", "巨門":"忌"}, "戊": {"貪狼":"祿", "太陰":"權", "右弼":"科", "天機":"忌"}, "己": {"武曲":"祿", "貪狼":"權", "天梁":"科", "文曲":"忌"}, "庚": {"太陽":"祿", "武曲":"權", "太陰":"科", "同同":"忌"}, "辛": {"巨門":"祿", "太陽":"權", "文曲":"科", "文昌":"忌"}, "壬": {"天梁":"祿", "紫微":"權", "左輔":"科", "武曲":"忌"}, "癸": {"破軍":"祿", "巨門":"權", "太陰":"科", "貪狼":"忌"} };
 
     function toggleMulti() {
         const isChecked = document.getElementById('hasMulti').checked;
@@ -224,14 +224,17 @@
         const now = new Date();
         const currentAge = now.getFullYear() - y + 1;
 
-        // 顯示命主邏輯
+        // 判定陰陽男女
+        const isYangYear = ["甲","丙","戊","庚","壬"].includes(yGan);
+        const genderFull = (isYangYear ? "陽" : "陰") + gen;
+
         const displayName = uName.trim() === "" ? "命主" : uName;
-        document.getElementById('c-row2').innerHTML = `<span>${displayName}</span><span>${gen}</span><span>${["","","水二局","木三局","金四局","土五局","火六局"][juNum]}</span>`;
+        document.getElementById('c-row2').innerHTML = `<span>${displayName}</span><span>${genderFull}</span><span>${["","","水二局","木三局","金四局","土五局","火六局"][juNum]}</span>`;
         
-        // 國曆農曆格式優化：時辰緊跟在日期後
+        // 冒號改為半形 ":"，節省寬度
         document.getElementById('c-dates').innerHTML = `
-            <div class="date-line"><span class="date-label">國曆：</span><span>${solar.getYear()}年${solar.getMonth()}月${solar.getDay()}日 ${hIn}:${mIn}</span></div>
-            <div class="date-line"><span class="date-label">農曆：</span><span>${lunar.getYearInGanZhi()}年${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}日${ZHI[hIdx]}時</span></div>
+            <div class="date-line"><span class="date-label">國曆:</span><span>${solar.getYear()}年${solar.getMonth()}月${solar.getDay()}日 ${hIn}:${mIn}</span></div>
+            <div class="date-line"><span class="date-label">農曆:</span><span>${lunar.getYearInGanZhi()}年${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}日${ZHI[hIdx]}時</span></div>
         `;
 
         const isYangGan = ["甲","丙","戊","庚","壬"].includes(yGan);
