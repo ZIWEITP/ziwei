@@ -10,8 +10,8 @@
     <style>
         :root { 
             --star-main: #4A4E52; 
-            --palace-bg: #95949A; /* 莫蘭迪水泥灰 */
-            --palace-text: #FFFFFF; 
+            --palace-bg: #F5F5F5; 
+            --palace-text: #95949A; /* 莫蘭迪水泥灰 */
             --graphite-gray: #4A4E52;   
             --morandi-blue: #5E6D79; 
             --dark-navy-grey: #3A4652; 
@@ -73,10 +73,7 @@
         .cell { background: #fff; border: 0.2px solid var(--morandi-blue); position: relative; padding: 3px; box-sizing: border-box; }
         .star-container { position: absolute; top: 4px; left: 4px; display: flex; flex-direction: row; gap: 2px; }
         .star-item { display: flex; flex-direction: column; align-items: center; }
-        
-        /* 星辰改為粗體 */
         .star-name { font-family: 'Noto Serif TC', serif; font-size: 3.8vw; font-weight: 900; color: var(--graphite-gray); writing-mode: vertical-rl; line-height: 1.1; }
-        
         .sihua-tag { font-size: 3vw; padding: 1px 2px; border-radius: 2px; color: white; margin-top: 2px; line-height: 1; }
         .sihua-祿 { background-color: #2D6A4F; } .sihua-權 { background-color: #6A4C93; } .sihua-科 { background-color: #1976D2; } .sihua-忌 { background-color: #D62828; }
         
@@ -85,29 +82,25 @@
             display: flex; flex-direction: column; justify-content: flex-start; 
             align-items: center; border: 1px solid var(--morandi-blue); padding: 15px 5px 5px 5px; 
         }
-        
-        /* 中宮第一排：牛仔藍 + 陰影立體感 */
         .c-title { 
             font-family: 'Noto Serif TC', serif; font-size: 4.5vw; color: var(--morandi-denim-blue); font-weight: bold; 
             margin-bottom: 12px; margin-top: 5px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2); 
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.15); 
         }
-        
-        .c-info { font-size: 3.8vw; display: flex; gap: 8px; font-weight: bold; color: var(--morandi-dusty-pink); margin-bottom: 10px; }
+        .c-info { 
+            font-size: 3.8vw; display: flex; gap: 8px; font-weight: bold; 
+            color: var(--morandi-dusty-pink); 
+            margin-bottom: 10px; 
+        }
         .date-info { font-size: 3.1vw; color: var(--lilac-purple); line-height: 1.5; text-align: left; width: 94%; }
         .date-line { display: flex; justify-content: flex-start; margin-bottom: 2px; white-space: nowrap; }
-        .date-label { width: 42px; flex-shrink: 0; }
+        .date-label { width: 38px; flex-shrink: 0; }
 
-        /* 宮職：莫蘭迪水泥灰 */
         .palace-name { position: absolute; bottom: 3px; left: 3px; font-size: 4vw; font-weight: 900; background: var(--palace-bg); color: var(--palace-text); width: 7.5vw; height: 7.5vw; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
-        
         .daxian-container { position: absolute; bottom: 10vw; left: 50%; transform: translateX(-50%); }
         .daxian-label { font-size: 3vw; color: #8E9AAF; white-space: nowrap; font-family: 'cwTeXFangSong'; }
         .current-daxian-style { border: 1px solid var(--dark-navy-grey); border-radius: 4px; padding: 0 3px; color: var(--dark-navy-grey); font-weight: bold; }
-        
-        /* 干支：莫蘭迪霧霾藍 */
         .gan-zhi-label { position: absolute; bottom: 3px; right: 3px; font-size: 3.8vw; font-weight: 900; display: flex; flex-direction: column; line-height: 1.1; text-align: center; color: var(--morandi-haze-blue); }
-        
         .bottom-nav { margin-top: 25px; display: flex; justify-content: center; }
 
         @media (min-width: 500px) {
@@ -117,7 +110,7 @@
             .c-title { font-size: 22px; }
             .c-info { font-size: 17px; }
             .date-info { font-size: 14px; }
-            .date-label { width: 50px; }
+            .date-label { width: 45px; }
         }
     </style>
 </head>
@@ -241,8 +234,8 @@
         
         // 移除冒號，改為空格
         document.getElementById('c-dates').innerHTML = `
-            <div class="date-line"><span class="date-label">國曆</span><span>${solar.getYear()}年${solar.getMonth()}月${solar.getDay()}日 ${hIn}:${mIn}</span></div>
-            <div class="date-line"><span class="date-label">農曆</span><span>${lunar.getYearInGanZhi()}年${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}日${ZHI[hIdx]}時</span></div>
+            <div class="date-line"><span class="date-label">國曆 </span><span>${solar.getYear()}年${solar.getMonth()}月${solar.getDay()}日 ${hIn}:${mIn}</span></div>
+            <div class="date-line"><span class="date-label">農曆 </span><span>${lunar.getYearInGanZhi()}年${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}日${ZHI[hIdx]}時</span></div>
         `;
 
         const isYangGan = ["甲","丙","戊","庚","壬"].includes(yGan);
