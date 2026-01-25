@@ -43,11 +43,16 @@
         <div class="input-group"><label>曆法</label><select id="calType"><option value="solar">國曆</option><option value="lunar">農曆</option></select></div>
         <div class="input-group" style="flex:1.5"><label>出生日期</label><input type="text" id="bDate" maxlength="8" placeholder="19900101"></div>
         <div class="input-group"><label>時</label><input type="text" id="bHour" placeholder="0-23"></div>
+        <div class="input-group"><label>分</label><input type="text" id="bMin" placeholder="0-59" value="0"></div>
     </div>
     <div class="input-row" style="align-items: center;">
         <label><input type="checkbox" id="hasMulti" onchange="toggleMulti()"> 雙胞胎/多胞胎</label>
         <select id="birthOrder" style="display:none; width:120px; margin-left: 10px;">
-            <option value="1">第一胎</option><option value="2">第二胎</option><option value="3">第三胎</option><option value="4">第四胎</option><option value="5">第五胎</option>
+            <option value="1">第一胎</option>
+            <option value="2">第二胎</option>
+            <option value="3">第三胎</option>
+            <option value="4">第四胎</option>
+            <option value="5">第五胎</option>
         </select>
     </div>
     <button onclick="renderBoard()" style="width:100%; height:52px; background:var(--morandi-blue); color:white; border:none; border-radius:15px; font-size:18px; cursor:pointer; margin-top:15px; font-weight:bold; font-family:'cwTeXFangSong';">開始排盤</button>
@@ -102,39 +107,38 @@
         const dVal = document.getElementById('bDate').value;
         const uName = document.getElementById('uName').value || "命主";
         let h = parseInt(document.getElementById('bHour').value || 0);
+        let m_val = parseInt(document.getElementById('bMin').value || 0);
+        
         if (dVal.length !== 8) return alert("日期格式錯誤");
 
-        const y = parseInt(dVal.substring(0,4)), m = parseInt(dVal.substring(4,6)), d = parseInt(dVal.substring(6,8));
-        let lunarObj = (document.getElementById('calType').value === 'solar') ? Solar.fromYmd(y,m,d).getLunar() : Lunar.fromYmd(y,m,d);
+        const yy = parseInt(dVal.substring(0,4)), mm = parseInt(dVal.substring(4,6)), dd = parseInt(dVal.substring(6,8));
+        let lunarObj = (document.getElementById('calType').value === 'solar') ? Solar.fromYmd(yy,mm,dd).getLunar() : Lunar.fromYmd(yy,mm,dd);
         
-        // 閏月處理邏輯
+        // 修正版閏月邏輯
         let lMonth = lunarObj.getMonth();
-        if (lunarObj.getLeapMonth() > 0 && lunarObj.getMonth() === lunarObj.getLeapMonth()) {
-            if (lunarObj.getDay() >= 16) lMonth += 1;
+        if (lunarObj.getLeapMonth() > 0 && Math.abs(lunarObj.getMonth()) === lunarObj.getLeapMonth()) {
+            if (lunarObj.getDay() >= 16) lMonth = Math.abs(lMonth) + 1;
+            else lMonth = Math.abs(lMonth);
         }
 
         const yGan = lunarObj.getYearGan();
         const hIdx = Math.floor(((h + 1) % 24) / 2);
 
-        // 1. 宮位天干
-        const wuHu = {"甲":"丙","己":"丙","乙":"戊","庚":"戊","丙":"庚","辛":"庚","丁":"壬","壬":"壬","戊":"甲","癸":"甲"};
         ZHI.forEach(z => {
+            const wuHu = {"甲":"丙","己":"丙","乙":"戊","庚":"戊","丙":"庚","辛":"庚","丁":"壬","壬":"壬","戊":"甲","癸":"甲"};
             let gIdx = (GAN.indexOf(wuHu[yGan]) + (ZHI.indexOf(z) >= 2 ? ZHI.indexOf(z)-2 : ZHI.indexOf(z)+10)) % 10;
             document.getElementById('cell-'+z).innerHTML = `<div class="star-container"></div><span class="palace-name"></span><span class="daxian-label"></span><div class="gan-zhi-label"><span class="gan-text">${GAN[gIdx]}</span>${z}</div>`;
         });
 
-        // 2. 第一胎命宮與局數 (基準固定)
         const baseMIdx = (2 + (lMonth - 1) - hIdx + 12) % 12;
         const baseMGan = document.getElementById('cell-'+ZHI[baseMIdx]).querySelector('.gan-text').innerText;
         const bureau = getBureau(baseMGan, ZHI[baseMIdx]);
 
-        // 3. 命宮標籤位移
         let actualMIdx = baseMIdx;
         if(document.getElementById('hasMulti').checked) {
             actualMIdx = (baseMIdx - (parseInt(document.getElementById('birthOrder').value) - 1) + 12) % 12;
         }
 
-        // 4. 佈十二宮標籤與大限
         const isYang = ["甲","丙","戊","庚","壬"].includes(yGan);
         const isMale = document.getElementById('gender').value === "男";
         const isForward = (isYang && isMale) || (!isYang && !isMale);
@@ -142,12 +146,12 @@
         for(let i=0; i<12; i++) {
             let targetIdx = (actualMIdx - i + 12) % 12;
             document.getElementById('cell-'+ZHI[targetIdx]).querySelector('.palace-name').innerText = PALACES[i].substring(0,2);
-            let dxTargetIdx = isForward ? (actualMIdx + i) % 12 : (actualMIdx - i + 12) % 12;
+            let dxOffsetIdx = isForward ? i : (12 - i) % 12;
+            let dxTargetIdx = (actualMIdx + dxOffsetIdx) % 12;
             let startAge = bureau + (i * 10);
             document.getElementById('cell-'+ZHI[dxTargetIdx]).querySelector('.daxian-label').innerText = `${startAge}-${startAge+9}`;
         }
 
-        // 5. 佈星 (固定以第一胎局數為準)
         let day = lunarObj.getDay();
         let q = Math.ceil(day / bureau), r = day % bureau;
         let zwIdx = (r === 0) ? (2 + q - 1) % 12 : ((bureau - r) % 2 === 0 ? (2 + q + (bureau - r) - 1) % 12 : (2 + q - (bureau - r) - 1) % 12);
@@ -178,7 +182,7 @@
         document.getElementById('input-page').style.display = 'none';
         document.getElementById('result-container').style.display = 'block';
         document.getElementById('c-row2').innerText = `${uName} (${document.getElementById('gender').value}) - ${["","","水二局","木三局","金四局","土五局","火六局"][bureau]}`;
-        document.getElementById('c-dates').innerHTML = `國曆：${lunarObj.getSolar().toYmd()}<br>農曆：${lunarObj.getYearInGanZhi()}年${lunarObj.getMonthInChinese()}月${lunarObj.getDayInChinese()}日 ${ZHI[hIdx]}時`;
+        document.getElementById('c-dates').innerHTML = `國曆：${lunarObj.getSolar().toYmd()}<br>農曆：${lunarObj.getYearInGanZhi()}年${lunarObj.getMonthInChinese()}月${lunarObj.getDayInChinese()}日 ${ZHI[hIdx]}時${m_val}分`;
     }
 </script>
 </body>
