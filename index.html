@@ -14,6 +14,7 @@
         .input-group { display: flex; flex-direction: column; flex: 1; min-width: 120px; }
         .input-group label { font-size: 16px; font-weight: bold; color: #4A4E52; margin-bottom: 8px; font-family: 'cwTeXFangSong'; }
         input, select { height: 48px; border: 1.5px solid #d1d5db; border-radius: 12px; font-size: 16px; padding: 0 10px; width: 100%; box-sizing: border-box; }
+        .hint-text { color: #d62828; font-size: 15px; font-weight: bold; margin-top: 10px; display: none; line-height: 1.5; font-family: 'cwTeXFangSong'; }
         #result-container { display: none; width: 100%; text-align: center; margin-top: 20px; }
         .board-wrapper { width: 100%; display: flex; justify-content: center; overflow: hidden; }
         .board-scaler { width: var(--board-width); transform-origin: top center; flex-shrink: 0; }
@@ -46,15 +47,13 @@
         <div class="input-group"><label>分</label><input type="text" id="bMin" placeholder="0-59" value="0"></div>
     </div>
     <div class="input-row" style="align-items: center;">
-        <label><input type="checkbox" id="hasMulti" onchange="toggleMulti()"> 雙胞胎/多胞胎</label>
+        <label><input type="checkbox" id="isDST"> 日光節約</label>
+        <label style="margin-left: 20px;"><input type="checkbox" id="hasMulti" onchange="toggleMulti()"> 雙胞胎/多胞胎</label>
         <select id="birthOrder" style="display:none; width:120px; margin-left: 10px;">
-            <option value="1">第一胎</option>
-            <option value="2">第二胎</option>
-            <option value="3">第三胎</option>
-            <option value="4">第四胎</option>
-            <option value="5">第五胎</option>
+            <option value="1">第一胎</option><option value="2">第二胎</option><option value="3">第三胎</option><option value="4">第四胎</option><option value="5">第五胎</option>
         </select>
     </div>
+    <div id="multiNotice" class="hint-text">＊ 若非第一胎者，除性別外，請輸入第一胎出生時間，以便準確排盤。</div>
     <button onclick="renderBoard()" style="width:100%; height:52px; background:var(--morandi-blue); color:white; border:none; border-radius:15px; font-size:18px; cursor:pointer; margin-top:15px; font-weight:bold; font-family:'cwTeXFangSong';">開始排盤</button>
 </div>
 
@@ -85,7 +84,9 @@
     const SI_HUA = {"甲":{"廉貞":"祿","破軍":"權","武曲":"科","太陽":"忌"},"乙":{"天機":"祿","天梁":"權","紫微":"科","太陰":"忌"},"丙":{"天同":"祿","天機":"權","文昌":"科","廉貞":"忌"},"丁":{"太陰":"祿","天同":"權","天機":"科","巨門":"忌"},"戊":{"貪狼":"祿","太陰":"權","右弼":"科","天機":"忌"},"己":{"武曲":"祿","貪狼":"權","天梁":"科","文曲":"忌"},"庚":{"太陽":"祿","武曲":"權","太陰":"科","天同":"忌"},"辛":{"太陽":"權","巨門":"祿","文曲":"科","文昌":"忌"},"壬":{"天梁":"祿","紫微":"權","左輔":"科","武曲":"忌"},"癸":{"破軍":"祿","巨門":"權","太陰":"科","貪狼":"忌"}};
 
     function toggleMulti() {
-        document.getElementById('birthOrder').style.display = document.getElementById('hasMulti').checked ? 'inline-block' : 'none';
+        const isChecked = document.getElementById('hasMulti').checked;
+        document.getElementById('birthOrder').style.display = isChecked ? 'inline-block' : 'none';
+        document.getElementById('multiNotice').style.display = isChecked ? 'block' : 'none';
     }
 
     function addStar(zhi, starName, yearGan, type='main') {
@@ -109,16 +110,20 @@
         let h = parseInt(document.getElementById('bHour').value || 0);
         let m_val = parseInt(document.getElementById('bMin').value || 0);
         
+        // 日光節約修正
+        if(document.getElementById('isDST').checked) h -= 1;
         if (dVal.length !== 8) return alert("日期格式錯誤");
 
         const yy = parseInt(dVal.substring(0,4)), mm = parseInt(dVal.substring(4,6)), dd = parseInt(dVal.substring(6,8));
         let lunarObj = (document.getElementById('calType').value === 'solar') ? Solar.fromYmd(yy,mm,dd).getLunar() : Lunar.fromYmd(yy,mm,dd);
         
-        // 修正版閏月邏輯
+        // 核心：閏月邏輯 (15日以前算本月，16日以後算下月)
         let lMonth = lunarObj.getMonth();
-        if (lunarObj.getLeapMonth() > 0 && Math.abs(lunarObj.getMonth()) === lunarObj.getLeapMonth()) {
-            if (lunarObj.getDay() >= 16) lMonth = Math.abs(lMonth) + 1;
-            else lMonth = Math.abs(lMonth);
+        let isLeap = lunarObj.getLeapMonth() > 0 && Math.abs(lunarObj.getMonth()) === lunarObj.getLeapMonth();
+        if (isLeap && lunarObj.getDay() >= 16) {
+            lMonth = Math.abs(lMonth) + 1;
+        } else {
+            lMonth = Math.abs(lMonth);
         }
 
         const yGan = lunarObj.getYearGan();
@@ -181,7 +186,7 @@
 
         document.getElementById('input-page').style.display = 'none';
         document.getElementById('result-container').style.display = 'block';
-        document.getElementById('c-row2').innerText = `${uName} (${document.getElementById('gender').value}) - ${["","","水二局","木三局","金四局","土五局","火六局"][bureau]}`;
+        document.getElementById('c-row2').innerText = `命主 (${document.getElementById('gender').value}) - ${["","","水二局","木三局","金四局","土五局","火六局"][bureau]}`;
         document.getElementById('c-dates').innerHTML = `國曆：${lunarObj.getSolar().toYmd()}<br>農曆：${lunarObj.getYearInGanZhi()}年${lunarObj.getMonthInChinese()}月${lunarObj.getDayInChinese()}日 ${ZHI[hIdx]}時${m_val}分`;
     }
 </script>
