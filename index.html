@@ -19,7 +19,7 @@
         .input-group label { font-weight: 700; margin-bottom: 10px; color: var(--graphite-gray); font-size: 18px; }
         input, select { height: 50px; padding: 0 15px; border: 1.5px solid #eee; border-radius: 12px; font-size: 17px; background: #fff; outline: none; box-sizing: border-box; }
         
-        /* 淺灰色預設值 */
+        /* 淺灰色預設值樣式 */
         .time-input { color: #BBB; }
         .time-input:focus { color: var(--graphite-gray); }
 
@@ -28,10 +28,13 @@
         .gender-option input { position: absolute; opacity: 0; width: 0; height: 0; }
         .gender-label { display: flex; align-items: center; justify-content: center; height: 100%; border: 1.5px solid #eee; border-radius: 12px; cursor: pointer; font-weight: 700; color: #999; }
         .gender-option input:checked + .gender-label { border-color: var(--morandi-denim-blue); background: var(--morandi-denim-blue); color: white; }
+        
         .time-wrapper { display: flex; gap: 12px; align-items: center; }
         .time-wrapper input { flex: 1; text-align: center; }
+        
         .options-row { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px; }
         .checkbox-item { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 700; font-size: 16px; }
+        
         #multi-box { display: none; margin-top: 20px; }
         .multi-hint { color: #888; font-size: 14px; margin-top: 10px; line-height: 1.5; }
         .btn-start { display: block; width: 100%; max-width: 250px; margin: 40px auto 0; padding: 16px; background: var(--dark-navy-grey); color: white; border: none; border-radius: 15px; font-size: 20px; font-weight: 900; cursor: pointer; }
@@ -40,17 +43,15 @@
         .grid-container { display: grid; grid-template-columns: repeat(4, 1fr); width: 98vw; max-width: 800px; aspect-ratio: 4/5.2; background: var(--morandi-denim-blue); border: 4px solid var(--morandi-denim-blue); gap: 1px; margin: 0 auto; }
         .cell { background: #fff; position: relative; padding: 10px; box-sizing: border-box; display: flex; flex-direction: column; cursor: pointer; overflow: visible; }
         .center-box { grid-column: 2 / 4; grid-row: 2 / 4; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #eee; }
-        .c-title { font-size: 20px; font-weight: 900; color: var(--morandi-light-blue); letter-spacing: 2px; text-align: center; margin-bottom: 5px; }
+        .c-title { font-size: 20px; font-weight: 900; color: var(--morandi-light-blue); letter-spacing: 2px; text-align: center; }
         
-        /* 星曜靠左直排 */
-        .star-container { display: flex; flex-direction: row; gap: 8px; height: 85%; align-items: flex-start; }
+        .star-container { display: flex; flex-direction: row; gap: 6px; height: 85%; align-items: flex-start; }
         .star-box { display: flex; flex-direction: column; align-items: center; position: relative; width: 22px; }
-        .star-name { font-size: 18px; font-weight: 900; writing-mode: vertical-rl; color: var(--graphite-gray); letter-spacing: 2px; }
+        .star-name { font-size: 18px; font-weight: 900; writing-mode: vertical-rl; color: var(--graphite-gray); letter-spacing: 2px; line-height: 1.1; }
         
-        .fly-label { font-size: 13px; font-weight: 900; color: var(--morandi-lotus); writing-mode: vertical-rl; position: absolute; top: 110%; white-space: nowrap; }
+        .fly-label { font-size: 13px; font-weight: 900; color: var(--morandi-lotus); writing-mode: vertical-rl; position: absolute; top: 105%; white-space: nowrap; }
         
-        /* 來因宮金色直寫外框 */
-        .origin-palace-tag { position: absolute; top: 10px; right: 8px; font-size: 15px; font-weight: 900; color: var(--origin-gold); writing-mode: vertical-rl; letter-spacing: 2px; border: 1.5px solid var(--origin-gold); padding: 5px 2px; border-radius: 6px; background: #fff; z-index: 10; }
+        .origin-palace-tag { position: absolute; top: 10px; right: 8px; font-size: 14px; font-weight: 900; color: var(--origin-gold); writing-mode: vertical-rl; letter-spacing: 2px; border: 1.5px solid var(--origin-gold); padding: 5px 2px; border-radius: 5px; background: #fff; line-height: 1.1; }
         
         .palace-name { position: absolute; bottom: 8px; left: 8px; font-size: 18px; font-weight: 900; background: var(--palace-bg); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
         .gan-zhi-label { position: absolute; bottom: 8px; right: 8px; font-size: 16px; font-weight: 900; color: var(--graphite-gray); line-height: 1.1; text-align: right; }
@@ -106,7 +107,7 @@
         <div class="cell" id="cell-辰" onclick="handleFly(this, '辰')" style="grid-area:2/1"></div>
         <div class="center-box">
             <div class="c-title">唐朝宮廷命理研究院</div>
-            <div id="c-info" style="text-align:center; font-weight:700; color:var(--morandi-lotus); font-size:14px;"></div>
+            <div id="c-info" style="text-align:center; font-weight:700; color:var(--morandi-lotus); font-size:14px; margin-top:5px;"></div>
         </div>
         <div class="cell" id="cell-酉" onclick="handleFly(this, '酉')" style="grid-area:2/4"></div>
         <div class="cell" id="cell-卯" onclick="handleFly(this, '卯')" style="grid-area:3/1"></div>
@@ -129,6 +130,7 @@
 
     function addStar(zhi, name) {
         const cell = document.getElementById('cell-' + zhi);
+        if (!cell) return;
         const container = cell.querySelector('.star-container');
         container.innerHTML += `<div class="star-box" data-sname="${name}"><span class="star-name">${name}</span></div>`;
     }
@@ -137,7 +139,7 @@
         const dVal = document.getElementById('bDate').value;
         const hIn = parseInt(document.getElementById('bHour').value) || 0;
         const order = parseInt(document.getElementById('birthOrder').value) || 1;
-        if(dVal.length !== 8) return alert("日期格式需為8位數");
+        if(dVal.length !== 8) return alert("日期需為8位數字");
 
         let lunar = (document.getElementById('calType').value === 'solar') ? 
                     Solar.fromYmd(parseInt(dVal.substr(0,4)), parseInt(dVal.substr(4,2)), parseInt(dVal.substr(6,2))).getLunar() :
@@ -147,7 +149,6 @@
         document.getElementById('input-page').style.display='none';
         document.getElementById('result-page').style.display='block';
 
-        // 1. 初始化宮位 DOM
         const wuHu = {"甲":"丙","己":"丙","乙":"戊","庚":"戊","丙":"庚","辛":"庚","丁":"壬","壬":"壬","戊":"甲","癸":"甲"};
         let yearGan = lunar.getYearGan();
         let startGanIdx = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"].indexOf(wuHu[yearGan]);
@@ -160,10 +161,9 @@
             if(g === yearGan) cell.innerHTML += `<div class="origin-palace-tag">來因宮</div>`;
         });
 
-        // 2. 定位宮名 (命宮偏移)
         let mIdx = lunar.getMonth();
         let mingZhiIdx = (2 + (mIdx - 1) - hIdx + 12) % 12;
-        mingZhiIdx = (mingZhiIdx - (order - 1) + 12) % 12; // 胎次修正
+        mingZhiIdx = (mingZhiIdx - (order - 1) + 12) % 12;
 
         for(let i=0; i<12; i++) {
             let z = ZHI[(mingZhiIdx - i + 12) % 12];
@@ -172,9 +172,9 @@
             c.dataset.pname = PALACES[i];
         }
 
-        // 3. 安星 (基準 1=寅)
-        let局 = [2,6,3,5,4,2,6,3,5,4,2,6][mingZhiIdx];
-        let q = Math.ceil(lunar.getDay()/局), r = (局*q)-lunar.getDay();
+        let juNum = [2,6,3,5,4,2,6,3,5,4,2,6][mingZhiIdx];
+        let day = lunar.getDay();
+        let q = Math.ceil(day/juNum), r = (juNum*q)-day;
         let zwIdx = (2 + (r % 2 === 0 ? (q - 1 + r) : (q - 1 - r)) + 12) % 12;
 
         ["紫微","天機","","太陽","武曲","天同","","", "廉貞"].forEach((s,i) => { if(s) addStar(ZHI[(zwIdx-i+12)%12], s); });
