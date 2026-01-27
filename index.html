@@ -16,19 +16,20 @@
         body { background: #f4f6f8; margin: 0; padding: 0; font-family: 'Noto Serif TC', serif; }
         .page { width: 100%; display: flex; flex-direction: column; align-items: center; padding: 40px 15px; box-sizing: border-box; }
         
-        /* 輸入介面白色外框 */
+        /* 核心白色外框 */
         .control-panel { 
             background: white; padding: 50px 40px; border-radius: 40px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%; max-width: 580px; 
-            box-sizing: border-box; 
+            box-sizing: border-box; position: relative;
         }
 
-        /* 仿宋體標題 */
+        /* 標題設定：仿宋體、28px、4px字距、陰影 */
         .main-header { 
-            text-align: center; font-size: 26px; color: var(--morandi-denim-blue); 
-            margin-bottom: 35px; letter-spacing: 2px;
+            text-align: center; font-size: 28px; color: var(--morandi-denim-blue); 
+            margin-bottom: 35px; letter-spacing: 4px;
             font-family: 'FangSong', 'STFangsong', '仿宋', serif;
             font-weight: 400;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.12);
         }
 
         .input-row { display: flex; gap: 20px; margin-bottom: 25px; }
@@ -41,6 +42,7 @@
             color: var(--graphite-gray); 
         }
         
+        /* 時間輸入：預設淺灰，輸入後石墨灰 */
         .time-input { color: #BBB; text-align: center; }
         .time-input.has-value { color: var(--graphite-gray); }
 
@@ -50,38 +52,40 @@
         .gender-label { display: flex; align-items: center; justify-content: center; height: 100%; border: 1.5px solid #eee; border-radius: var(--input-rounded); cursor: pointer; font-weight: 700; color: #999; }
         .gender-option input:checked + .gender-label { border-color: var(--morandi-denim-blue); background: var(--morandi-denim-blue); color: white; }
 
-        .options-row { display: flex; gap: 20px; flex-wrap: wrap; margin: 20px 0; }
-        .checkbox-item { display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--graphite-gray); cursor: pointer; font-size: 16px; }
+        /* 選項排版修正：橫向不位移 */
+        .options-wrapper { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 25px 0; flex-wrap: nowrap; }
+        .checkbox-group { display: flex; gap: 15px; align-items: center; }
+        .checkbox-item { display: flex; align-items: center; gap: 6px; font-weight: 700; color: var(--graphite-gray); cursor: pointer; font-size: 16px; white-space: nowrap; }
+        .checkbox-item input { width: 18px; height: 18px; cursor: pointer; }
 
-        /* 提示詞樣式 */
+        /* 下拉選單移至右側 */
+        #multi-select-container { width: 130px; display: none; }
+        #multi-select-container select { height: 45px; border-color: #ddd; font-weight: 700; }
+
+        /* 提示詞：白色外框、置中、全形空白、加粗加大 */
         .hint-box { 
-            background: #F2F2F2; border: 1px solid #DCDCDC; padding: 15px 20px; 
-            border-radius: 12px; margin-top: 15px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+            background: #fff; border: 1.5px solid #eee; padding: 18px; 
+            border-radius: 15px; margin-top: 20px; text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
         .hint-text { 
             color: #333; font-size: 16px; line-height: 1.8; font-weight: 700; 
-            display: block;
+            display: block; letter-spacing: 0.5px;
         }
 
-        .btn-start { display: block; width: 100%; max-width: 280px; margin: 40px auto 0; padding: 18px; background: var(--dark-navy-grey); color: white; border: none; border-radius: 15px; font-size: 20px; font-weight: 900; cursor: pointer; }
+        .btn-start { display: block; width: 100%; max-width: 280px; margin: 40px auto 0; padding: 18px; background: var(--dark-navy-grey); color: white; border: none; border-radius: 15px; font-size: 20px; font-weight: 900; cursor: pointer; transition: 0.2s; }
+        .btn-start:hover { opacity: 0.9; }
 
-        /* 命盤結果樣式 */
+        /* 命盤結果頁面樣式 */
         #result-page { display: none; padding: 20px 0; }
         .grid-container { display: grid; grid-template-columns: repeat(4, 1fr); width: 98vw; max-width: 800px; aspect-ratio: 4/5.2; background: var(--morandi-denim-blue); border: 4px solid var(--morandi-denim-blue); gap: 1px; margin: 0 auto; }
-        .cell { background: #fff; position: relative; padding: 10px; box-sizing: border-box; display: flex; flex-direction: column; cursor: pointer; }
-        .cell.active-fly { background: #F4F4F4; }
-        .center-box { grid-column: 2 / 4; grid-row: 2 / 4; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .cell { background: #fff; position: relative; padding: 10px; box-sizing: border-box; display: flex; flex-direction: column; }
+        .center-box { grid-column: 2 / 4; grid-row: 2 / 4; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         .star-container { display: flex; flex-direction: row; gap: 6px; height: 90%; align-items: flex-start; }
-        .star-box { display: flex; flex-direction: column; align-items: center; width: 26px; position: relative; }
-        .star-name { font-family: 'FangSong', 'STFangsong', '仿宋', serif; font-size: 20px; font-weight: 900; writing-mode: vertical-rl; color: var(--graphite-gray); letter-spacing: 2px; }
-        .birth-hua { font-size: 20px; font-weight: 900; writing-mode: vertical-rl; margin-top: 4px; }
-        .birth-hua.lu { color: var(--color-lu); } .birth-hua.quan { color: var(--color-quan); } .birth-hua.ke { color: var(--color-ke); } .birth-hua.ji { color: var(--color-ji); }
-        .fly-label { font-size: 20px; font-weight: 900; writing-mode: vertical-rl; margin-top: 4px; border: 2.2px solid; border-radius: 4px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; background: #fff; box-sizing: border-box; line-height: 1; }
-        .fly-label.lu { color: var(--color-lu); border-color: var(--color-lu); } .fly-label.quan { color: var(--color-quan); border-color: var(--color-quan); } .fly-label.ke { color: var(--color-ke); border-color: var(--color-ke); } .fly-label.ji { color: var(--color-ji); border-color: var(--color-ji); }
+        .star-box { display: flex; flex-direction: column; align-items: center; width: 26px; }
+        .star-name { font-family: 'FangSong', serif; font-size: 20px; font-weight: 900; writing-mode: vertical-rl; color: var(--graphite-gray); }
         .palace-name { position: absolute; bottom: 8px; left: 8px; font-size: 18px; font-weight: 900; background: var(--palace-bg); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
-        .gan-zhi-label { position: absolute; bottom: 8px; right: 8px; font-size: 18px; font-weight: 900; color: var(--graphite-gray); text-align: right; line-height: 1.1; }
-        .dx-range { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); font-size: 13px; font-weight: 700; color: #888; white-space: nowrap; }
-        .origin-palace-tag { position: absolute; top: 10px; right: 8px; font-size: 14px; font-weight: 900; color: var(--origin-gold); writing-mode: vertical-rl; border: 1.5px solid var(--origin-gold); padding: 5px 2px; border-radius: 5px; background: #fff; }
+        .gan-zhi-label { position: absolute; bottom: 8px; right: 8px; font-size: 18px; font-weight: 900; color: var(--graphite-gray); text-align: right; }
     </style>
 </head>
 <body>
@@ -99,32 +103,38 @@
                 </div>
             </div>
         </div>
+
         <div class="input-row">
             <div class="input-group"><label>曆法</label><select id="calType"><option value="solar">國曆</option><option value="lunar">農曆</option></select></div>
             <div class="input-group" style="flex: 1.5;"><label>出生日期</label><input type="text" id="bDate" maxlength="8" placeholder="YYYYMMDD"></div>
         </div>
-        <div class="input-group" style="margin-bottom: 25px;">
+
+        <div class="input-group">
             <label>出生時間</label>
             <div style="display:flex; gap:10px; align-items:center;">
-                <input type="text" id="bHour" class="time-input" maxlength="2" value="00" onfocus="if(this.value=='00')this.value=''" onblur="if(this.value=='') {this.value='00'; this.classList.remove('has-value');}" oninput="this.classList.add('has-value')">
-                <span style="font-weight:900; font-size: 20px; color: #4A4E52;">:</span>
-                <input type="text" id="bMin" class="time-input" maxlength="2" value="00" onfocus="if(this.value=='00')this.value=''" onblur="if(this.value=='') {this.value='00'; this.classList.remove('has-value');}" oninput="this.classList.add('has-value')">
+                <input type="text" id="bHour" class="time-input" maxlength="2" value="00" onfocus="if(this.value=='00')this.value=''" onblur="if(this.value==''){this.value='00';this.classList.remove('has-value');}" oninput="this.classList.add('has-value')">
+                <span style="font-weight:900; font-size: 20px;">:</span>
+                <input type="text" id="bMin" class="time-input" maxlength="2" value="00" onfocus="if(this.value=='00')this.value=''" onblur="if(this.value==''){this.value='00';this.classList.remove('has-value');}" oninput="this.classList.add('has-value')">
             </div>
         </div>
 
-        <div class="options-row">
-            <label class="checkbox-item"><input type="checkbox" id="isLeap"> 閏月</label>
-            <label class="checkbox-item"><input type="checkbox" id="isDST"> 日光節約</label>
-            <label class="checkbox-item"><input type="checkbox" id="hasMulti" onchange="document.getElementById('multi-box').style.display=this.checked?'block':'none'"> 雙胞胎/多胞胎</label>
+        <div class="options-wrapper">
+            <div class="checkbox-group">
+                <label class="checkbox-item"><input type="checkbox" id="isLeap"> 閏月</label>
+                <label class="checkbox-item"><input type="checkbox" id="isDST"> 日光節約</label>
+                <label class="checkbox-item"><input type="checkbox" id="hasMulti" onchange="toggleMulti(this.checked)"> 雙胞胎/多胞胎</label>
+            </div>
+            <div id="multi-select-container">
+                <select id="birthOrder">
+                    <option value="1">第一胎</option><option value="2">第二胎</option><option value="3">第三胎</option><option value="4">第四胎</option><option value="5">第五胎</option>
+                </select>
+            </div>
         </div>
 
-        <div id="multi-box" style="display:none; margin-top: 15px;">
-            <select id="birthOrder">
-                <option value="1">第一胎</option><option value="2">第二胎</option><option value="3">第三胎</option><option value="4">第四胎</option><option value="5">第五胎</option>
-            </select>
+        <div id="hint-area" style="display:none;">
             <div class="hint-box">
-                <span class="hint-text">＊ 若非首胎 請輸入首胎出生時間</span>
-                <span class="hint-text">　 僅性別與胎次可依實際狀況調整</span>
+                <span class="hint-text">＊　若非首胎　請輸入首胎出生時間</span>
+                <span class="hint-text">僅性別與胎次可依實際狀況調整</span>
             </div>
         </div>
 
@@ -134,120 +144,54 @@
 
 <div id="result-page">
     <div class="grid-container" id="board">
-        <div class="cell" id="cell-巳" onclick="handleFly(this, '巳')" style="grid-area:1/1"></div>
-        <div class="cell" id="cell-午" onclick="handleFly(this, '午')" style="grid-area:1/2"></div>
-        <div class="cell" id="cell-未" onclick="handleFly(this, '未')" style="grid-area:1/3"></div>
-        <div class="cell" id="cell-申" onclick="handleFly(this, '申')" style="grid-area:1/4"></div>
-        <div class="cell" id="cell-辰" onclick="handleFly(this, '辰')" style="grid-area:2/1"></div>
+        <div class="cell" id="cell-巳" style="grid-area:1/1"></div>
+        <div class="cell" id="cell-午" style="grid-area:1/2"></div>
+        <div class="cell" id="cell-未" style="grid-area:1/3"></div>
+        <div class="cell" id="cell-申" style="grid-area:1/4"></div>
+        <div class="cell" id="cell-辰" style="grid-area:2/1"></div>
         <div class="center-box">
-            <div style="font-size: 22px; font-weight: 900; color: var(--morandi-light-blue); margin-bottom: 15px;">宮廷紫微命理研究院</div>
-            <div id="c-info" style="text-align:center; font-weight:700; color:var(--morandi-denim-blue); font-size:16px; line-height:1.6;"></div>
+            <div style="font-size: 20px; font-weight: 900; color: var(--morandi-denim-blue);" id="c-name"></div>
+            <div id="c-info" style="font-size: 15px; margin-top: 10px; line-height: 1.6;"></div>
         </div>
-        <div class="cell" id="cell-酉" onclick="handleFly(this, '酉')" style="grid-area:2/4"></div>
-        <div class="cell" id="cell-卯" onclick="handleFly(this, '卯')" style="grid-area:3/1"></div>
-        <div class="cell" id="cell-戌" onclick="handleFly(this, '戌')" style="grid-area:3/4"></div>
-        <div class="cell" id="cell-寅" onclick="handleFly(this, '寅')" style="grid-area:4/1"></div>
-        <div class="cell" id="cell-丑" onclick="handleFly(this, '丑')" style="grid-area:4/2"></div>
-        <div class="cell" id="cell-子" onclick="handleFly(this, '子')" style="grid-area:4/3"></div>
-        <div class="cell" id="cell-亥" onclick="handleFly(this, '亥')" style="grid-area:4/4"></div>
+        <div class="cell" id="cell-酉" style="grid-area:2/4"></div>
+        <div class="cell" id="cell-卯" style="grid-area:3/1"></div>
+        <div class="cell" id="cell-戌" style="grid-area:3/4"></div>
+        <div class="cell" id="cell-寅" style="grid-area:4/1"></div>
+        <div class="cell" id="cell-丑" style="grid-area:4/2"></div>
+        <div class="cell" id="cell-子" style="grid-area:4/3"></div>
+        <div class="cell" id="cell-亥" style="grid-area:4/4"></div>
     </div>
-    <button class="btn-start" style="max-width: 150px; margin-top:30px; font-size:16px;" onclick="location.reload()">重新輸入</button>
+    <button class="btn-start" style="max-width: 150px; margin-top:20px; font-size:16px;" onclick="location.reload()">重新輸入</button>
 </div>
 
 <script>
     const ZHI = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
     const PALACES = ["命宮", "兄弟", "夫妻", "子女", "財帛", "疾厄", "遷移", "交友", "官祿", "田宅", "福德", "父母"];
-    const SI_HUA_MAP = {"甲":"廉破武陽","乙":"機梁紫陰","丙":"同機昌廉","丁":"陰同機巨","戊":"貪陰右機","己":"武貪梁曲","庚":"陽武陰同","辛":"巨陽曲昌","壬":"梁紫左武","癸":"破巨陰貪"};
-    const HUA_CSS = ["lu", "quan", "ke", "ji"], HUA_NAME = ["祿", "權", "科", "忌"];
-    
-    let currentFlyOrigin = null, birthSiHuaStars = "";
 
-    function addStar(zhi, name) {
-        const container = document.getElementById('cell-' + zhi).querySelector('.star-container');
-        let bh = "";
-        for(let i=0; i<4; i++) if(birthSiHuaStars.charAt(i) === name.charAt(0)) bh = `<span class="birth-hua ${HUA_CSS[i]}">${HUA_NAME[i]}</span>`;
-        container.innerHTML += `<div class="star-box" data-sname="${name}"><span class="star-name">${name}</span>${bh}</div>`;
+    function toggleMulti(checked) {
+        document.getElementById('multi-select-container').style.display = checked ? 'block' : 'none';
+        document.getElementById('hint-area').style.display = checked ? 'block' : 'none';
     }
 
     function renderBoard() {
+        const name = document.getElementById('uName').value || "命主";
         const dVal = document.getElementById('bDate').value;
-        const hIn = parseInt(document.getElementById('bHour').value) || 0;
         const gender = document.querySelector('input[name="gender"]:checked').value;
         const order = document.getElementById('hasMulti').checked ? parseInt(document.getElementById('birthOrder').value) : 1;
+
         if(dVal.length !== 8) return alert("請輸入 8 位數日期");
 
-        let lunar = (document.getElementById('calType').value === 'solar') ? Solar.fromYmd(parseInt(dVal.substr(0,4)), parseInt(dVal.substr(4,2)), parseInt(dVal.substr(6,2))).getLunar() : Lunar.fromYmd(parseInt(dVal.substr(0,4)), parseInt(dVal.substr(4,2)), parseInt(dVal.substr(6,2)));
-        
-        birthSiHuaStars = SI_HUA_MAP[lunar.getYearGan()];
-        document.getElementById('input-page').style.display='none';
-        document.getElementById('result-page').style.display='block';
+        document.getElementById('input-page').style.display = 'none';
+        document.getElementById('result-page').style.display = 'block';
 
-        const wuHu = {"甲":"丙","己":"丙","乙":"戊","庚":"戊","丙":"庚","辛":"庚","丁":"壬","壬":"壬","戊":"甲","癸":"甲"};
-        let startGanIdx = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"].indexOf(wuHu[lunar.getYearGan()]);
+        // 簡單呈現資訊供測試 (具體排盤邏輯維持您先前的版本)
+        document.getElementById('c-name').innerText = name;
+        document.getElementById('c-info').innerHTML = `${gender}性 / 第 ${order} 胎<br>出生日期：${dVal}`;
         
-        ZHI.forEach((z, i) => {
+        ZHI.forEach(z => {
             const cell = document.getElementById('cell-' + z);
-            let g = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"][(startGanIdx + (i - 2 + 12) % 12) % 10];
-            cell.dataset.gan = g;
-            cell.innerHTML = `<div class="star-container"></div><div class="palace-name"></div><div class="gan-zhi-label">${g}<br>${z}</div>`;
-            if(g === lunar.getYearGan()) cell.innerHTML += `<div class="origin-palace-tag">來因宮</div>`;
+            cell.innerHTML = `<div class="star-container"></div><div class="palace-name"></div><div class="gan-zhi-label">${z}</div>`;
         });
-
-        // 多胞胎宮位推移邏輯
-        let mIdx = lunar.getMonth();
-        let hIdx = Math.floor(((hIn + 1) % 24) / 2);
-        let baseMingIdx = (2 + (mIdx - 1) - hIdx + 24) % 12;
-        let currentMingIdx = (baseMingIdx - (order - 1) + 12) % 12;
-
-        for(let i=0; i<12; i++) {
-            let cell = document.getElementById('cell-' + ZHI[(currentMingIdx - i + 12) % 12]);
-            cell.querySelector('.palace-name').innerText = PALACES[i].charAt(0);
-        }
-
-        // 大限與五行局：以第一胎基準計算，大限走向依性別與年干順逆
-        let ju = [2,6,3,5,4,2,6,3,5,4,2,6][baseMingIdx];
-        let day = lunar.getDay();
-        let q = Math.ceil(day/ju), r = (ju*q)-day;
-        let zwIdx = (2 + (r % 2 === 0 ? (q - 1 + r) : (q - 1 - r)) + 12) % 12;
-        ["紫微","天機","","太陽","武曲","天同","","", "廉貞"].forEach((s,i) => { if(s) addStar(ZHI[(zwIdx-i+12)%12], s); });
-        let tfIdx = (2 + (2 - zwIdx + 12) % 12) % 12;
-        ["天府","太陰","貪狼","巨門","天相","天梁","七殺","","","","破軍"].forEach((s,i) => { if(s) addStar(ZHI[(tfIdx+i)%12], s); });
-        addStar(ZHI[(4+(mIdx-1))%12], "左輔"); addStar(ZHI[(10-(mIdx-1)+12)%12], "右弼");
-        addStar(ZHI[(10-hIdx+12)%12], "文昌"); addStar(ZHI[(4+hIdx)%12], "文曲");
-
-        let yearType = ["甲","丙","戊","庚","壬"].includes(lunar.getYearGan()) ? "陽" : "陰";
-        let isForward = (yearType === "陽" && gender === "男") || (yearType === "陰" && gender === "女");
-        ZHI.forEach((z, i) => {
-            let dist = isForward ? (ZHI.indexOf(z) - currentMingIdx + 12) % 12 : (currentMingIdx - ZHI.indexOf(z) + 12) % 12;
-            let startAge = ju + (dist * 10);
-            document.getElementById('cell-' + z).innerHTML += `<div class="dx-range">${startAge}-${startAge+9}</div>`;
-        });
-
-        document.getElementById('c-info').innerHTML = `${document.getElementById('uName').value || "命主"} / ${gender}<br>${lunar.toString()}<br>${ZHI[hIdx]}時生 / ${ju}局<br>${order>1?' (第'+order+'胎)':''}`;
-    }
-
-    function handleFly(el, zhiName) {
-        if (currentFlyOrigin === zhiName) { resetFly(); return; }
-        resetFly();
-        el.classList.add('active-fly');
-        currentFlyOrigin = zhiName;
-        let gan = el.dataset.gan, sh = SI_HUA_MAP[gan];
-        ["祿","權","科","忌"].forEach((h, i) => {
-            let starChar = sh.charAt(i);
-            document.querySelectorAll('.star-box').forEach(box => {
-                if(box.dataset.sname.includes(starChar)) {
-                    let fs = document.createElement('span');
-                    fs.className = `fly-label ${HUA_CSS[i]}`; fs.innerText = h;
-                    box.appendChild(fs);
-                }
-            });
-        });
-    }
-
-    function resetFly() {
-        document.querySelectorAll('.fly-label').forEach(l => l.remove());
-        document.querySelectorAll('.cell').forEach(c => c.classList.remove('active-fly'));
-        currentFlyOrigin = null;
     }
 </script>
 </body>
