@@ -9,13 +9,14 @@
     <style>
         :root { 
             --graphite-gray: #4A4E52; --morandi-denim-blue: #5E6D79; --morandi-light-blue: #7A8A99; 
-            --dark-navy-grey: #3A4652; --palace-bg: #E8E8E8; --origin-gold: #FFD700;
+            --dark-navy-grey: #3A4652; --morandi-lotus: #C2A59F; --palace-bg: #E8E8E8; --origin-gold: #FFD700;
             --color-lu: #2E7D32; --color-quan: #7B1FA2; --color-ke: #1976D2; --color-ji: #C62828;
             --input-rounded: 15px;
         }
         body { background: #f4f6f8; margin: 0; padding: 0; font-family: 'Noto Serif TC', serif; }
         .page { width: 100%; display: flex; flex-direction: column; align-items: center; padding: 40px 15px; box-sizing: border-box; }
         
+        /* 截圖樣式輸入區塊 */
         .control-panel { background: white; padding: 40px; border-radius: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%; max-width: 550px; box-sizing: border-box; }
         .input-row { display: flex; gap: 20px; margin-bottom: 25px; align-items: flex-end; }
         .input-group { display: flex; flex-direction: column; flex: 1; min-width: 0; }
@@ -39,29 +40,36 @@
         .hint-text { color: #888; font-size: 14px; margin-top: 10px; line-height: 1.5; }
         .btn-start { display: block; width: 100%; max-width: 280px; margin: 30px auto 0; padding: 18px; background: var(--dark-navy-grey); color: white; border: none; border-radius: 15px; font-size: 20px; font-weight: 900; cursor: pointer; }
 
-        /* 結果頁樣式 */
+        /* 命盤樣式 */
         #result-page { display: none; padding: 20px 0; }
         .grid-container { display: grid; grid-template-columns: repeat(4, 1fr); width: 98vw; max-width: 800px; aspect-ratio: 4/5.2; background: var(--morandi-denim-blue); border: 4px solid var(--morandi-denim-blue); gap: 1px; margin: 0 auto; }
         .cell { background: #fff; position: relative; padding: 10px; box-sizing: border-box; display: flex; flex-direction: column; cursor: pointer; }
         .cell.active-fly { background: #F4F4F4; }
-        .center-box { grid-column: 2 / 4; grid-row: 2 / 4; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         
+        /* 恢復原始中宮 */
+        .center-box { grid-column: 2 / 4; grid-row: 2 / 4; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        
+        /* 星辰字體改為仿宋，加大至 20px */
         .star-container { display: flex; flex-direction: row; gap: 6px; height: 95%; align-items: flex-start; }
-        .star-box { display: flex; flex-direction: column; align-items: center; width: 24px; position: relative; }
-        .star-name { font-size: 18px; font-weight: 900; writing-mode: vertical-rl; color: var(--graphite-gray); letter-spacing: 2px; }
+        .star-box { display: flex; flex-direction: column; align-items: center; width: 26px; position: relative; }
+        .star-name { 
+            font-family: 'FangSong', 'STFangsong', '仿宋', serif; 
+            font-size: 20px; font-weight: 900; writing-mode: vertical-rl; 
+            color: var(--graphite-gray); letter-spacing: 2px; 
+        }
         
-        .birth-hua { font-size: 18px; font-weight: 900; writing-mode: vertical-rl; margin-top: 4px; }
+        .birth-hua { font-size: 20px; font-weight: 900; writing-mode: vertical-rl; margin-top: 4px; }
         .birth-hua.lu { color: var(--color-lu); }
         .birth-hua.quan { color: var(--color-quan); }
         .birth-hua.ke { color: var(--color-ke); }
         .birth-hua.ji { color: var(--color-ji); }
 
-        /* 正方形加框飛化 */
+        /* 方形飛化標籤 */
         .fly-label { 
-            font-size: 18px; font-weight: 900; writing-mode: vertical-rl; 
-            margin-top: 4px; border: 2px solid; border-radius: 4px; 
-            width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
-            background: #fff; box-sizing: border-box; 
+            font-size: 20px; font-weight: 900; writing-mode: vertical-rl; 
+            margin-top: 4px; border: 2.2px solid; border-radius: 4px; 
+            width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
+            background: #fff; box-sizing: border-box; line-height: 1;
         }
         .fly-label.lu { color: var(--color-lu); border-color: var(--color-lu); }
         .fly-label.quan { color: var(--color-quan); border-color: var(--color-quan); }
@@ -70,7 +78,9 @@
 
         .origin-palace-tag { position: absolute; top: 10px; right: 8px; font-size: 14px; font-weight: 900; color: var(--origin-gold); writing-mode: vertical-rl; border: 1.5px solid var(--origin-gold); padding: 5px 2px; border-radius: 5px; background: #fff; }
         .palace-name { position: absolute; bottom: 8px; left: 8px; font-size: 18px; font-weight: 900; background: var(--palace-bg); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
-        .gan-zhi-label { position: absolute; bottom: 8px; right: 8px; font-size: 16px; font-weight: 900; color: var(--graphite-gray); text-align: right; line-height: 1.1; }
+        
+        /* 干支字體加大至 18px */
+        .gan-zhi-label { position: absolute; bottom: 8px; right: 8px; font-size: 18px; font-weight: 900; color: var(--graphite-gray); text-align: right; line-height: 1.1; }
     </style>
 </head>
 <body>
@@ -126,8 +136,8 @@
         <div class="cell" id="cell-申" onclick="handleFly(this, '申')" style="grid-area:1/4"></div>
         <div class="cell" id="cell-辰" onclick="handleFly(this, '辰')" style="grid-area:2/1"></div>
         <div class="center-box">
-            <div style="font-size: 20px; font-weight: 900; color: var(--morandi-light-blue); margin-bottom: 10px;">唐朝宮廷命理研究院</div>
-            <div id="c-info" style="text-align:center; font-weight:700; color:var(--morandi-lotus); font-size:15px; line-height:1.6;"></div>
+            <div style="font-size: 22px; font-weight: 900; color: var(--morandi-light-blue); margin-bottom: 15px;">唐朝宮廷命理研究院</div>
+            <div id="c-info" style="text-align:center; font-weight:700; color:var(--morandi-lotus); font-size:16px; line-height:1.6;"></div>
         </div>
         <div class="cell" id="cell-酉" onclick="handleFly(this, '酉')" style="grid-area:2/4"></div>
         <div class="cell" id="cell-卯" onclick="handleFly(this, '卯')" style="grid-area:3/1"></div>
@@ -151,7 +161,9 @@
     let birthSiHuaStars = "";
 
     function addStar(zhi, name) {
-        const container = document.getElementById('cell-' + zhi).querySelector('.star-container');
+        const cell = document.getElementById('cell-' + zhi);
+        if(!cell) return;
+        const container = cell.querySelector('.star-container');
         let birthHuaHtml = "";
         for(let i=0; i<4; i++) {
             if(birthSiHuaStars.charAt(i) === name.charAt(0)) {
