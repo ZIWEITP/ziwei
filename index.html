@@ -136,12 +136,12 @@
             <div class="input-group">
                 <label>出生時間</label>
                 <div class="time-wrapper">
-                    <input type="text" id="bHour" list="hour-options" placeholder="23" maxlength="2" style="color:#333">
+                    <input type="text" id="bHour" list="hour-options" placeholder="23" maxlength="2">
                     <datalist id="hour-options">
                         <script>for(let i=0; i<24; i++) document.write(`<option value="${i < 10 ? '0'+i : i}"></option>`);</script>
                     </datalist>
                     <span>:</span>
-                    <input type="text" id="bMin" list="min-options" placeholder="00" maxlength="2" style="color:#333">
+                    <input type="text" id="bMin" list="min-options" placeholder="00" maxlength="2">
                     <datalist id="min-options">
                         <script>for(let i=0; i<60; i++) document.write(`<option value="${i < 10 ? '0'+i : i}"></option>`);</script>
                     </datalist>
@@ -272,27 +272,25 @@
             }
         });
 
-        // --- 核心修改：基準與位移邏輯 ---
-        // 1. 定基準：不論第幾胎，五行局與星辰計算皆鎖定首胎命宮位置 (firstMIdx)
+        // 1. 定基準：不論胎次，首胎命宮位置恆定
         let firstMIdx = (2 + (lunar.getMonth()-1) - hIdx + 12) % 12;
         
-        // 2. 宮位推移：僅標籤 (palace-name) 隨胎次移動
+        // 2. 宮位標籤推移：首胎 birthOrder=1 時位移為0，完全對應 PALACES
         let currentMIdx = (firstMIdx - (birthOrder - 1) + 12) % 12;
         for(let i=0; i<12; i++) {
             document.getElementById('cell-'+ZHI[(currentMIdx - i + 12) % 12]).querySelector('.palace-name').innerText = PALACES[i];
         }
 
-        // 3. 計算五行局：以首胎 (firstMIdx) 的宮位干支為準
+        // 3. 計算五行局：鎖定首胎命宮干支
         let firstMGan = document.getElementById('cell-'+ZHI[firstMIdx]).querySelector('.gan-zhi-label').innerText.charAt(0);
         let bureauNum = { "甲": [4,4,2,2,6,6,2,2,4,4,6,6], "己": [4,4,2,2,6,6,2,2,4,4,6,6], "乙": [6,6,5,5,2,2,5,5,6,6,2,2], "庚": [6,6,5,5,2,2,5,5,6,6,2,2], "丙": [5,5,3,3,4,4,3,3,5,5,4,4], "辛": [5,5,3,3,4,4,3,3,5,5,4,4], "丁": [2,2,4,4,5,5,4,4,2,2,5,5], "壬": [2,2,4,4,5,5,4,4,2,2,5,5], "戊": [3,3,6,6,3,3,6,6,3,3,6,6], "癸": [3,3,6,6,3,3,6,6,3,3,6,6] }[firstMGan][firstMIdx];
         
-        // 4. 大限走向與當前大限：走向以基準為準，標籤顯示位置隨位移同步
+        // 4. 大限走向
         let isYang = "甲丙戊庚壬".includes(yearGan);
         let direction = ( (isYang && gender==="男") || (!isYang && gender==="女") ) ? 1 : -1;
         let nowAge = Solar.fromDate(new Date()).getYear() - solar.getYear() + 1;
         
         for(let i=0; i<12; i++) {
-            // 位移後的宮位對應大限 (大限起首跟隨命盤標籤邏輯)
             let zIdx = (currentMIdx + (i * direction) + 12) % 12;
             let startAge = bureauNum + (i * 10);
             let labelDiv = document.querySelector(`#cell-${ZHI[zIdx]} .limit-label`);
@@ -300,17 +298,23 @@
             if(nowAge >= startAge && nowAge <= startAge+9) labelDiv.classList.add("limit-active");
         }
 
-        // 5. 安星辰 (安紫微星影片邏輯)：鎖定 bureauNum 與農曆生日，不隨胎次改變
+        // 5. 安星順序修正
         let day = lunar.getDay();
         let q = Math.ceil(day / bureauNum), r = (bureauNum * q) - day;
         let zwIdx = ((r % 2 === 0 ? (2 + (q - 1) + r) : (2 + (q - 1) - r)) + 12) % 12;
 
-        // 放置所有星曜
-        ["紫微","天機","","太陽","武曲","天同","","", "廉貞"].forEach((s,i)=>{if(s)addStar(ZHI[(zwIdx-i+12)%12],s,Object.keys(curSiHua).find(k=>curSiHua[k]===s),1);});
+        // A. 紫微星系 (逆時針)
+        const zwStars = ["紫微","天機","","太陽","武曲","天同","","", "廉貞"];
+        zwStars.forEach((s, i) => { if(s) addStar(ZHI[(zwIdx - i + 12) % 12], s, Object.keys(curSiHua).find(k=>curSiHua[k]===s), 1); });
+
+        // B. 天府星系 (順時針)
         let tfIdx = (4 - zwIdx + 12) % 12;
-        ["天府","太陰","貪狼","巨門","天相","天梁","七殺","","","","破軍"].forEach((s,i)=>{if(s)addStar(ZHI[(tfIdx+i)%12],s,Object.keys(curSiHua).find(k=>curSiHua[k]===s),2);});
-        const month = lunar.getMonth();
-        [{n:"左輔",z:(4+month-1)%12},{n:"右弼",z:(10-month+1+12)%12},{n:"文昌",z:(10-hIdx+12)%12},{n:"文曲",z:(4+hIdx)%12}].forEach(s=>{addStar(ZHI[s.z],s.n,Object.keys(curSiHua).find(k=>curSiHua[k]===s.n),3);});
+        const tfStars = ["天府","太陰","貪狼","巨門","天相","天梁","七殺","","","","破軍"];
+        tfStars.forEach((s, i) => { if(s) addStar(ZHI[(tfIdx + i) % 12], s, Object.keys(curSiHua).find(k=>curSiHua[k]===s), 2); });
+
+        // C. 六吉星
+        const monthNum = lunar.getMonth();
+        [{n:"左輔",z:(4+monthNum-1)%12},{n:"右弼",z:(10-monthNum+1+12)%12},{n:"文昌",z:(10-hIdx+12)%12},{n:"文曲",z:(4+hIdx)%12}].forEach(s=>{addStar(ZHI[s.z],s.n,Object.keys(curSiHua).find(k=>curSiHua[k]===s.n),3);});
         const ky = {"甲":["丑","未"],"戊":["丑","未"],"庚":["丑","未"],"乙":["子","申"],"己":["子","申"],"丙":["亥","酉"],"丁":["亥","酉"],"壬":["卯","巳"],"癸":["卯","巳"],"辛":["午","寅"]}[yearGan];
         addStar(ky[0],"天魁",null,3); addStar(ky[1],"天鉞",null,3);
 
