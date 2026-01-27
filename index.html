@@ -36,7 +36,7 @@
         .cell { background: #fff; position: relative; padding: 8px; box-sizing: border-box; display: flex; flex-direction: column; cursor: pointer; }
         .center-box { grid-column: 2 / 4; grid-row: 2 / 4; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .c-title { font-size: 22px; font-weight: 900; color: var(--morandi-light-blue); letter-spacing: 2px; margin-bottom: 10px; text-align: center; }
-        .star-container { display: flex; flex-direction: row-reverse; gap: 6px; height: 70%; align-items: flex-start; overflow: visible; padding-top: 5px; }
+        .star-container { display: flex; flex-direction: row-reverse; gap: 6px; height: 75%; align-items: flex-start; overflow: visible; padding-top: 5px; }
         .star-box { display: flex; flex-direction: column; align-items: center; position: relative; }
         .star-name { font-size: 18px; font-weight: 700; writing-mode: vertical-rl; color: var(--graphite-gray); letter-spacing: 2px; }
         .fly-label { font-size: 13px; font-weight: 900; color: var(--morandi-lotus); writing-mode: vertical-rl; position: absolute; top: 105%; }
@@ -74,13 +74,13 @@
         <div class="options-row">
             <label class="checkbox-item"><input type="checkbox" id="isLeap"> <span>閏月</span></label>
             <label class="checkbox-item"><input type="checkbox" id="isDST"> <span>日光節約時間</span></label>
-            <label class="checkbox-item"><input type="checkbox" id="hasMulti" onchange="toggleMulti()"> <span>雙胞胎/多胞胎</span></label>
+            <label class="checkbox-item"><input type="checkbox" id="hasMulti" onchange="toggleMulti()"> <span>多胞胎</span></label>
         </div>
         <div id="multi-box">
             <select id="birthOrder">
                 <option value="1">第一胎</option><option value="2">第二胎</option><option value="3">第三胎</option><option value="4">第四胎</option><option value="5">第五胎</option>
             </select>
-            <p class="multi-hint">＊ 若非首胎，請輸入首胎出生時間，僅性別與胎次可依實際狀況調整。</p>
+            <p class="multi-hint">＊ 若非首胎，請輸入首胎出生時間。</p>
         </div>
         <button class="btn-start" onclick="renderBoard()">開始排盤</button>
     </div>
@@ -107,13 +107,13 @@
 
     function toggleMulti() { document.getElementById('multi-box').style.display = document.getElementById('hasMulti').checked ? 'block' : 'none'; }
 
-    function addStar(zhi, name) {
-        const cell = document.getElementById('cell-' + zhi);
+    function addStar(zhiName, starName) {
+        const cell = document.getElementById('cell-' + zhiName);
         if (!cell) return;
         const container = cell.querySelector('.star-container');
         const box = document.createElement('div');
-        box.className = 'star-box'; box.dataset.sname = name;
-        box.innerHTML = `<span class="star-name">${name}</span>`;
+        box.className = 'star-box'; box.dataset.sname = starName;
+        box.innerHTML = `<span class="star-name">${starName}</span>`;
         container.appendChild(box);
     }
 
@@ -122,52 +122,74 @@
         const hIn = parseInt(document.getElementById('bHour').value) || 0;
         const order = parseInt(document.getElementById('birthOrder').value) || 1;
         if(dVal.length !== 8) return alert("日期格式需為8位數");
-        let solar = Solar.fromYmd(parseInt(dVal.substr(0,4)), parseInt(dVal.substr(4,2)), parseInt(dVal.substr(6,2)));
-        let lunar = solar.getLunar();
-        let hIdx = Math.floor(((hIn + 1) % 24) / 2);
+
+        let solar = (document.getElementById('calType').value === 'solar') ? 
+                    Solar.fromYmd(parseInt(dVal.substr(0,4)), parseInt(dVal.substr(4,2)), parseInt(dVal.substr(6,2))) :
+                    null;
+        let lunar = solar ? solar.getLunar() : Lunar.fromYmd(parseInt(dVal.substr(0,4)), parseInt(dVal.substr(4,2)), parseInt(dVal.substr(6,2)));
+        
+        // 核心邏輯：不分早晚子，23-01 統一算下一日之子時（依傳統排盤習慣，但代碼遵循您的不換日邏輯）
+        let hIdx = Math.floor(((hIn + 1) % 24) / 2); // 0=子, 1=丑... 2=寅
 
         document.getElementById('input-page').style.display='none';
         document.getElementById('result-page').style.display='block';
 
+        // 1. 初始化宮位天干 (五虎遁)
         const wuHu = {"甲":"丙","己":"丙","乙":"戊","庚":"戊","丙":"庚","辛":"庚","丁":"壬","壬":"壬","戊":"甲","癸":"甲"};
-        let startGanIdx = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"].indexOf(wuHu[lunar.getYearGan()]);
+        let yearGan = lunar.getYearGan();
+        let startGanIdx = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"].indexOf(wuHu[yearGan]);
         
         ZHI.forEach((z, i) => {
             const cell = document.getElementById('cell-' + z);
-            let g = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"][(startGanIdx + (i >= 2 ? i-2 : i+10)) % 10];
+            // 寅宮是 ZHI[2]，對應 startGanIdx
+            let g = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"][(startGanIdx + (i - 2 + 12) % 12) % 10];
             cell.dataset.gan = g;
             cell.innerHTML = `<div class="star-container"></div><div class="palace-name"></div><div class="gan-zhi-label">${g}<br>${z}</div>`;
-            if(g === lunar.getYearGan()) cell.insertAdjacentHTML('beforeend', `<div class="origin-palace-tag">來因宮</div>`);
+            if(g === yearGan) cell.insertAdjacentHTML('beforeend', `<div class="origin-palace-tag">來因宮</div>`);
         });
 
-        let mingIdx = (2 + (lunar.getMonth()-1) - hIdx + 12) % 12;
-        mingIdx = (mingIdx - (order - 1) + 12) % 12;
+        // 2. 定命宮與安宮名 (月時定命)
+        let mIdx = lunar.getMonth(); // 1-12
+        let mingZhiIdx = (2 + (mIdx - 1) - hIdx + 12) % 12; // 寅宮(2)起月逆回時
+        mingZhiIdx = (mingZhiIdx - (order - 1) + 12) % 12; // 多胞胎位移
+
         for(let i=0; i<12; i++) {
-            let z = ZHI[(mingIdx - i + 12) % 12];
+            let z = ZHI[(mingZhiIdx - i + 12) % 12];
             let c = document.getElementById('cell-' + z);
             c.querySelector('.palace-name').innerText = PALACES[i].charAt(0);
             c.dataset.pname = PALACES[i];
         }
 
-        let 局 = [2,6,3,5,4,2,6,3,5,4,2,6][mingIdx];
+        // 3. 定五行局 (命宮干支)
+        const nanyin = {"甲子":"金","乙丑":"金","丙寅":"火","丁卯":"火","戊辰":"木","己巳":"木","庚午":"土","辛未":"土","壬申":"金","癸酉":"金","甲戌":"火","乙亥":"火","丙子":"水","丁丑":"水","戊寅":"土","己卯":"土","庚辰":"金","辛巳":"金","壬午":"木","癸未":"木","甲申":"水","乙酉":"水","丙戌":"土","丁亥":"土","戊子":"火","己丑":"火","庚寅":"木","辛卯":"木","壬辰":"水","癸巳":"水","甲午":"金","乙未":"金","丙申":"火","丁酉":"火","戊戌":"木","己亥":"木","庚子":"土","辛丑":"土","壬寅":"金","癸卯":"金","甲辰":"火","乙巳":"火","丙午":"水","丁未":"水","戊申":"土","己酉":"土","庚戌":"金","辛亥":"金","壬子":"木","癸丑":"木","甲寅":"水","乙卯":"水","丙辰":"土","丁巳":"土","戊午":"火","己未":"火","庚申":"木","辛酉":"木","壬戌":"水","癸亥":"水"};
+        let mingCell = document.getElementById('cell-' + ZHI[mingZhiIdx]);
+        let gz = mingCell.querySelector('.gan-zhi-label').innerText.replace('\n','');
+        let 局數 = {"水":2,"木":3,"金":4,"土":5,"火":6}[nanyin[gz].charAt(0)];
+
+        // 4. 安紫微 (寅宮為1，公式：生日/局數)
         let day = lunar.getDay();
-        let q = Math.ceil(day/局), r = (局*q)-day;
-        let zwIdx = ((r % 2 === 0 ? (1 + (q - 1) + r) : (1 + (q - 1) - r)) + 12) % 12;
+        let q = Math.ceil(day/局數), r = (局數*q)-day;
+        let zwZhiIdx = (2 + (r % 2 === 0 ? (q - 1 + r) : (q - 1 - r)) + 12) % 12;
 
-        ["紫微","天機","","太陽","武曲","天同","","", "廉貞"].forEach((s,i) => { if(s) addStar(ZHI[(zwIdx-i+12)%12], s); });
-        let tfIdx = (4 - zwIdx + 12) % 12;
-        ["天府","太陰","貪狼","巨門","天相","天梁","七殺","","","","破軍"].forEach((s,i) => { if(s) addStar(ZHI[(tfIdx+i)%12], s); });
+        // 紫微星系 (逆行)
+        const zwStars = ["紫微","天機","","太陽","武曲","天同","","", "廉貞"];
+        zwStars.forEach((s,i) => { if(s) addStar(ZHI[(zwZhiIdx - i + 12) % 12], s); });
 
-        addStar(ZHI[(2+(lunar.getMonth()-1)+12)%12], "左輔");
-        addStar(ZHI[(10-(lunar.getMonth()-1)+12)%12], "右弼");
-        addStar(ZHI[(10-hIdx+12)%12], "文昌");
-        addStar(ZHI[(4+hIdx)%12], "文曲");
-        let kMap = {"甲":1,"乙":0,"丙":11,"丁":11,"戊":1,"己":0,"庚":1,"辛":6,"壬":3,"癸":3};
-        let yMap = {"甲":7,"乙":8,"丙":9,"丁":9,"戊":7,"己":8,"庚":9,"辛":2,"壬":5,"癸":5};
-        addStar(ZHI[kMap[lunar.getYearGan()]], "天魁");
-        addStar(ZHI[yMap[lunar.getYearGan()]], "天鉞");
+        // 天府星系 (對沖位置校正：寅申對、卯戌對...)
+        let tfZhiIdx = (2 + (2 - zwZhiIdx + 12) % 12) % 12;
+        const tfStars = ["天府","太陰","貪狼","巨門","天相","天梁","七殺","","","","破軍"];
+        tfStars.forEach((s,i) => { if(s) addStar(ZHI[(tfZhiIdx + i) % 12], s); });
 
-        document.getElementById('c-info').innerHTML = `${document.getElementById('uName').value || "命主"} ${document.querySelector('input[name="gender"]:checked').value}<br>${lunar.getYearInGanZhi()}年${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}日<br>${ZHI[hIdx]}時生`;
+        // 六吉星
+        addStar(ZHI[(2 + (mIdx - 1) + 12) % 12], "左輔");
+        addStar(ZHI[(10 - (mIdx - 1) + 12) % 12], "右弼");
+        addStar(ZHI[(10 - hIdx + 12) % 12], "文昌");
+        addStar(ZHI[(4 + hIdx) % 12], "文曲");
+        
+        let kY = {"甲":[1,7],"乙":[0,8],"丙":[11,9],"丁":[11,9],"戊":[1,7],"己":[0,8],"庚":[1,9],"辛":[6,2],"壬":[3,5],"癸":[3,5]}[yearGan];
+        addStar(ZHI[kY[0]], "天魁"); addStar(ZHI[kY[1]], "天鉞");
+
+        document.getElementById('c-info').innerHTML = `${document.getElementById('uName').value || "命主"} ${局數}局<br>${lunar.getYearInGanZhi()}年 ${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}日<br>${ZHI[hIdx]}時生`;
     }
 
     function handleFly(el, zhiName) {
