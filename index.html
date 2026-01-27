@@ -2,146 +2,316 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>唐朝宮廷紫微斗數</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>唐朝宮廷紫微斗數排盤</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
     <style>
-        /* 這裡完全保留你原本所有的 CSS 樣式，包含命盤與 UI 佈局 */
         :root { 
-            --accent-color: #3A4652; --border-color: #e0e0e0; --bg-gray: #f0f2f5;
+            --graphite-gray: #4A4E52; 
+            --morandi-denim-blue: #5E6D79; 
+            --morandi-light-blue: #7A8A99; 
+            --dark-navy-grey: #3A4652;
+            --warm-grey-border: #BDB7AD;
+            --morandi-lotus: #C2A59F; 
+            --morandi-green: #8DA399; 
+            --morandi-gold: #B59356; 
+            --palace-bg: #E8E8E8; 
             --lu-green: #2E7D32; --quan-purple: #7B1FA2; --ke-blue: #1976D2; --ji-red: #D32F2F;
         }
-        body { font-family: 'Noto Serif TC', serif; background: var(--bg-gray); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         
-        /* 輸入面板：完全對齊截圖 */
-        .control-panel { background: white; padding: 45px; border-radius: 50px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); width: 850px; box-sizing: border-box; }
-        .row { display: flex; gap: 30px; margin-bottom: 25px; align-items: flex-end; }
-        .input-group { flex: 1; display: flex; flex-direction: column; }
-        .input-group label { font-weight: 900; margin-bottom: 12px; color: #333; font-size: 20px; }
-        input, select { padding: 16px 20px; border: 1.5px solid var(--border-color); border-radius: 18px; font-size: 19px; outline: none; background-color: #fff; }
-        
-        .options-row { display: flex; gap: 25px; margin-top: 15px; align-items: center; flex-wrap: wrap; }
-        .checkbox-item { display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 700; font-size: 18px; }
-        
-        /* 雙胞胎提示詞樣式 */
-        .multi-hint { color: #5E6D79; font-size: 16px; margin-top: 15px; font-weight: 700; line-height: 1.6; display: none; }
-        #order-container { display: none; margin-left: 10px; }
-        #birthOrder { padding: 8px 15px; border-radius: 12px; border: 1.5px solid var(--border-color); }
+        body, input, select, button, div, span, label, p { 
+            font-family: 'Noto Serif TC', serif; 
+            font-size: 18px; 
+        }
+        body { background: #f4f6f8; margin: 0; padding: 0; }
 
-        .btn-start { width: 100%; padding: 22px; background: #3d4b59; color: white; border: none; border-radius: 22px; font-size: 26px; font-weight: 900; cursor: pointer; margin-top: 40px; letter-spacing: 8px; transition: background 0.3s; }
-        .btn-start:hover { background: #2c3640; }
+        .page { width: 100%; display: flex; flex-direction: column; align-items: center; padding: 40px 15px; box-sizing: border-box; }
+        
+        .control-panel { 
+            background: white; padding: 30px; border-radius: 24px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08); 
+            width: 100%; max-width: 500px; box-sizing: border-box; 
+        }
+        
+        .input-row { display: flex; gap: 15px; margin-bottom: 20px; width: 100%; align-items: flex-end; }
+        .input-group { display: flex; flex-direction: column; flex: 1; }
+        .input-group label { font-weight: 700; margin-bottom: 8px; color: var(--graphite-gray); font-size: 16px; }
+        
+        input, select { height: 45px; padding: 0 12px; border: 1.5px solid #e0e0e0; border-radius: 12px; width: 100%; box-sizing: border-box; background-color: #fff; outline: none; }
+        input::placeholder { color: #ccc; opacity: 1; }
 
-        /* 命盤樣式請保留在此處（省略以節省篇幅，請維持你原本的 grid 與 star-item CSS） */
-        #result-page { display: none; padding: 20px 0; background: #fff; }
+        .gender-container { display: flex; gap: 10px; height: 45px; }
+        .gender-option { flex: 1; position: relative; }
+        .gender-option input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+        .gender-label { 
+            display: flex; align-items: center; justify-content: center; 
+            height: 100%; border: 1.5px solid #e0e0e0; border-radius: 12px; 
+            cursor: pointer; font-weight: 700; color: #999; transition: all 0.3s;
+        }
+        .gender-option input:checked + .gender-label { 
+            border-color: var(--morandi-denim-blue); 
+            background: var(--morandi-denim-blue); color: white; 
+        }
+
+        .time-wrapper { display: flex; gap: 8px; align-items: center; }
+        .time-wrapper input { text-align: center; flex: 1; }
+
+        .options-row { display: flex; flex-direction: row; align-items: center; gap: 15px; flex-wrap: wrap; width: 100%; margin-top: 10px; }
+        .checkbox-item { display: flex; flex-direction: row; align-items: center; gap: 6px; cursor: pointer; font-weight: 700; white-space: nowrap; font-size: 16px; }
+        
+        .multi-hint { color: var(--morandi-denim-blue); font-size: 14px; margin-top: 15px; width: 100%; font-weight: 400; line-height: 1.6; display: none; }
+        
+        .btn-start { display: block; width: 100%; max-width: 200px; margin: 30px auto 0; padding: 14px; background: var(--dark-navy-grey); color: white; border: none; border-radius: 15px; font-size: 20px; font-weight: 700; cursor: pointer; }
+
+        #result-page { display: none; width: 100%; background: #fff; padding: 20px 0; }
+        .grid-container { display: grid; grid-template-columns: repeat(4, 1fr); width: 96vw; max-width: 720px; aspect-ratio: 4 / 5.2; background: var(--morandi-denim-blue); border: 4px solid var(--morandi-denim-blue); gap: 1px; margin: 0 auto; }
+        .cell { background: #fff; position: relative; padding: 5px; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; cursor: pointer; transition: background-color 0.2s; }
+        .cell.active-palace { background-color: #f0f0f0 !important; }
+        
+        .sh-label { font-size: 19px; font-weight: 700; writing-mode: vertical-rl; line-height: 1.1; margin-top: 2px; }
+        .sh-lu { color: var(--lu-green); } .sh-quan { color: var(--quan-purple); } .sh-ke { color: var(--ke-blue); } .sh-ji { color: var(--ji-red); }
+        .origin-palace-tag { position: absolute; top: 12px; right: 15px; writing-mode: vertical-rl; font-size: 16px; font-weight: 900; color: var(--morandi-gold); border: 1.5px solid var(--morandi-gold); border-radius: 20px; padding: 6px 3px; background-color: rgba(255, 255, 255, 0.9); letter-spacing: 1.5px; z-index: 10; pointer-events: none; }
+        
+        .star-container { display: flex; flex-direction: row; gap: 2px; height: 65%; padding: 2px; flex-wrap: wrap; pointer-events: none; }
+        .star-item { display: flex; flex-direction: column; align-items: center; position: relative; }
+        .star-name { font-size: 19px; font-weight: 700; writing-mode: vertical-rl; color: var(--graphite-gray); line-height: 1.2; letter-spacing: 2px; }
+        .dynamic-sh { font-size: 16px; font-weight: 900; writing-mode: vertical-rl; line-height: 1; border: 1px solid currentColor; border-radius: 3px; margin-top: 2px; display: none; }
+
+        .palace-name { position: absolute; bottom: 5%; left: 5%; font-size: 20px; font-weight: 900; background: var(--palace-bg); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; z-index: 2; pointer-events: none; }
+        .gan-zhi-label { position: absolute; bottom: 5%; right: 5%; font-size: 19px; font-weight: 900; line-height: 1.1; color: var(--graphite-gray); pointer-events: none; }
+        .btn-reset { margin: 25px auto; display: block; padding: 12px 45px; background: #f0f2f5; border: 1px solid #ddd; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        .limit-label { position: absolute; bottom: 32%; left: 0; width: 100%; text-align: center; pointer-events: none; }
+        .limit-label span { font-size: 16px; font-weight: 400; color: #8E8E8E; padding: 2px 10px; border: 1.5px solid transparent; border-radius: 6px; }
+        .limit-active span { border: 2px solid var(--morandi-denim-blue); background: #fff; color: var(--dark-navy-grey); font-weight: 700; }
+        .center-box { grid-column: 2 / 4; grid-row: 2 / 4; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 35px 5px 10px; box-sizing: border-box; }
+        .c-title { font-size: 26px; font-weight: 900; color: var(--morandi-light-blue); letter-spacing: 5px; margin-bottom: 22px; white-space: nowrap; }
+        .c-main-info { font-size: 22px; font-weight: 700; color: var(--morandi-lotus); margin-bottom: 15px; }
+        .c-date-info { font-size: 18px; color: var(--morandi-green); margin: 2px 0; display: flex; width: 260px; }
+        .date-label { width: 50px; font-weight: 700; flex-shrink: 0; }
+
+        /* --- 手機版專用微調 --- */
+        @media (max-width: 480px) {
+            .input-row { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .input-group { width: 100%; }
+            
+            /* 命盤文字縮小 */
+            .star-name { font-size: 15px; letter-spacing: 1px; }
+            .sh-label { font-size: 15px; }
+            .dynamic-sh { font-size: 13px; }
+            .palace-name { width: 28px; height: 28px; font-size: 15px; bottom: 3%; left: 3%; }
+            .gan-zhi-label { font-size: 15px; bottom: 3%; right: 3%; }
+            .limit-label span { font-size: 12px; padding: 1px 4px; }
+            .origin-palace-tag { font-size: 12px; top: 5px; right: 5px; padding: 4px 2px; }
+            
+            /* 中間資訊縮小 */
+            .c-title { font-size: 18px; letter-spacing: 2px; margin-bottom: 10px; }
+            .c-main-info { font-size: 16px; margin-bottom: 8px; }
+            .c-date-info { font-size: 13px; width: 100%; justify-content: center; }
+            .date-label { width: 40px; }
+            .center-box { padding: 20px 5px 5px; }
+        }
     </style>
 </head>
 <body>
 
-<div id="input-page" class="control-panel">
-    <div class="row">
-        <div style="flex: 2.5;" class="input-group">
-            <label>姓名</label>
-            <input type="text" id="uName" placeholder="請輸入姓名">
-        </div>
-        <div style="flex: 1;" class="input-group">
-            <label>性別</label>
-            <select id="gender">
-                <option value="" disabled selected>請選擇</option>
-                <option value="男">男</option>
-                <option value="女">女</option>
-            </select>
-        </div>
-    </div>
-
-    <div class="row">
-        <div style="flex: 0.8;" class="input-group">
-            <label>曆法</label>
-            <select id="calType">
-                <option value="solar">國曆</option>
-                <option value="lunar">農曆</option>
-            </select>
-        </div>
-        <div style="flex: 2;" class="input-group">
-            <label>出生日期</label>
-            <input type="text" id="bDate" placeholder="YYYYMMDD" maxlength="8">
-        </div>
-        <div style="flex: 2;" class="input-group">
-            <label>出生時間</label>
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <input type="text" id="bHour" placeholder="時" style="flex: 1;">
-                <span style="font-weight: 900; font-size: 22px;">:</span>
-                <input type="text" id="bMin" placeholder="分" value="00" style="flex: 1;">
+<div id="input-page" class="page">
+    <div class="control-panel">
+        <div class="input-row">
+            <div class="input-group"><label>姓名</label><input type="text" id="uName" placeholder="輸入姓名"></div>
+            <div class="input-group">
+                <label>性別</label>
+                <div class="gender-container">
+                    <label class="gender-option">
+                        <input type="radio" name="gender" value="男" checked>
+                        <span class="gender-label">男</span>
+                    </label>
+                    <label class="gender-option">
+                        <input type="radio" name="gender" value="女">
+                        <span class="gender-label">女</span>
+                    </label>
+                </div>
             </div>
         </div>
-    </div>
-
-    <div class="options-row">
-        <label class="checkbox-item"><input type="checkbox" id="isLeap"> 閏月</label>
-        <label class="checkbox-item"><input type="checkbox" id="isDST"> 日光節約時間</label>
-        <label class="checkbox-item">
-            <input type="checkbox" id="hasMulti" onchange="toggleMultiLogic(this)"> 雙胞胎/多胞胎
-        </label>
-        <div id="order-container">
-            <select id="birthOrder">
-                <option value="1">第一胎</option>
-                <option value="2">第二胎</option>
-                <option value="3">第三胎</option>
-                <option value="4">第四胎</option>
-                <option value="5">第五胎</option>
+        <div class="input-row">
+            <div class="input-group"><label>曆法</label><select id="calType"><option value="solar">國曆</option><option value="lunar">農曆</option></select></div>
+            <div class="input-group" style="flex: 1.5;"><label>出生日期</label><input type="text" id="bDate" maxlength="8" placeholder="YYYYMMDD"></div>
+        </div>
+        <div class="input-row">
+            <div class="input-group">
+                <label>出生時間</label>
+                <div class="time-wrapper">
+                    <input type="text" id="bHour" list="hour-options" placeholder="23" maxlength="2" style="color:#ccc">
+                    <datalist id="hour-options">
+                        <script>for(let i=0; i<24; i++) document.write(`<option value="${i < 10 ? '0'+i : i}"></option>`);</script>
+                    </datalist>
+                    <span>:</span>
+                    <input type="text" id="bMin" list="min-options" placeholder="00" maxlength="2" style="color:#ccc">
+                    <datalist id="min-options">
+                        <script>for(let i=0; i<60; i++) document.write(`<option value="${i < 10 ? '0'+i : i}"></option>`);</script>
+                    </datalist>
+                </div>
+            </div>
+        </div>
+        <div class="options-row">
+            <label class="checkbox-item"><input type="checkbox" id="isLeap" style="width:18px;height:18px;"> 閏月</label>
+            <label class="checkbox-item"><input type="checkbox" id="isDST" style="width:18px;height:18px;"> 日光節約</label>
+            <label class="checkbox-item"><input type="checkbox" id="hasMulti" onchange="toggleMulti()" style="width:18px;height:18px;"> 雙胞胎/多胞胎</label>
+            <select id="birthOrder" style="display: none; width: 120px;">
+                <option value="1">第一胎</option><option value="2">第二胎</option><option value="3">第三胎</option><option value="4">第四胎</option><option value="5">第五胎</option>
             </select>
         </div>
+        <div id="multiHint" class="multi-hint">＊ 若非首胎，請輸入首胎出生時間，僅性別與胎次可依實際狀況調整。</div>
+        <button class="btn-start" onclick="renderBoard()">開始排盤</button>
     </div>
-    
-    <div id="multiHint" class="multi-hint">＊ 若非首胎，請輸入首胎出生時間，僅性別與胎次可依實際狀況調整。</div>
+</div>
 
-    <button class="btn-start" onclick="renderBoard()">開始排盤</button>
+<div id="result-page">
+    <div class="grid-container" id="board">
+        <div class="cell" id="cell-巳" onclick="toggleSiHua('巳')"></div><div class="cell" id="cell-午" onclick="toggleSiHua('午')"></div><div class="cell" id="cell-未" onclick="toggleSiHua('未')"></div><div class="cell" id="cell-申" onclick="toggleSiHua('申')"></div>
+        <div class="cell" id="cell-辰" style="grid-area:2/1" onclick="toggleSiHua('辰')"></div>
+        <div class="center-box">
+            <div class="c-title">唐朝宮廷命理研究院</div>
+            <div id="c-main" class="c-main-info"></div>
+            <div class="c-date-container">
+                <div id="c-solar" class="c-date-info"></div>
+                <div id="c-lunar" class="c-date-info"></div>
+            </div>
+        </div>
+        <div class="cell" id="cell-酉" style="grid-area:2/4" onclick="toggleSiHua('酉')"></div>
+        <div class="cell" id="cell-卯" style="grid-area:3/1" onclick="toggleSiHua('卯')"></div><div class="cell" id="cell-戌" style="grid-area:3/4" onclick="toggleSiHua('戌')"></div>
+        <div class="cell" id="cell-寅" style="grid-area:4/1" onclick="toggleSiHua('寅')"></div><div class="cell" id="cell-丑" style="grid-area:4/2" onclick="toggleSiHua('丑')"></div><div class="cell" id="cell-子" style="grid-area:4/3" onclick="toggleSiHua('子')"></div><div class="cell" id="cell-亥" style="grid-area:4/4" onclick="toggleSiHua('亥')"></div>
+    </div>
+    <button class="btn-reset" onclick="location.reload()">返回重新輸入</button>
 </div>
 
 <script>
-    // 常數定義完全保留你原本的 ZHI, GAN, PALACES, SI_HUA
     const ZHI = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
     const GAN = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
     const PALACES = ["命", "兄", "夫", "子", "財", "疾", "遷", "友", "官", "田", "福", "父"];
+    const SI_HUA = { "甲": { "祿": "廉貞", "權": "破軍", "科": "武曲", "忌": "太陽" }, "乙": { "祿": "天機", "權": "天梁", "科": "紫微", "忌": "太陰" }, "丙": { "祿": "天同", "權": "天機", "科": "文昌", "忌": "廉貞" }, "丁": { "祿": "太陰", "權": "天同", "科": "天機", "忌": "巨門" }, "戊": { "祿": "貪狼", "權": "太陰", "科": "右弼", "忌": "天機" }, "己": { "祿": "武曲", "權": "貪狼", "科": "天梁", "忌": "文曲" }, "庚": { "祿": "太陽", "權": "武曲", "科": "太陰", "忌": "天同" }, "辛": { "祿": "巨門", "權": "太陽", "科": "文曲", "忌": "文昌" }, "壬": { "祿": "天梁", "權": "紫微", "科": "左輔", "忌": "武曲" }, "癸": { "祿": "破軍", "權": "巨門", "科": "太陰", "忌": "貪狼" } };
 
-    function toggleMultiLogic(cb) {
-        const orderSelect = document.getElementById('order-container');
-        const hint = document.getElementById('multiHint');
-        if (cb.checked) {
-            orderSelect.style.display = 'inline-block';
-            hint.style.display = 'block';
+    let currentSelectedZhi = null;
+
+    function toggleMulti() {
+        const isChecked = document.getElementById('hasMulti').checked;
+        document.getElementById('birthOrder').style.display = isChecked ? 'inline-block' : 'none';
+        document.getElementById('multiHint').style.display = isChecked ? 'block' : 'none';
+    }
+
+    function toggleSiHua(zhi) {
+        const cells = document.querySelectorAll('.cell');
+        const clickedCell = document.getElementById('cell-' + zhi);
+        const dynamicLabels = document.querySelectorAll('.dynamic-sh');
+
+        if (currentSelectedZhi === zhi) {
+            clickedCell.classList.remove('active-palace');
+            dynamicLabels.forEach(el => el.style.display = 'none');
+            currentSelectedZhi = null;
         } else {
-            orderSelect.style.display = 'none';
-            hint.style.display = 'none';
+            cells.forEach(c => c.classList.remove('active-palace'));
+            dynamicLabels.forEach(el => el.style.display = 'none');
+            clickedCell.classList.add('active-palace');
+            const palaceGan = clickedCell.querySelector('.gan-zhi-label').innerText.charAt(0);
+            const hua = SI_HUA[palaceGan];
+            document.querySelectorAll('.star-item').forEach(item => {
+                const sName = item.querySelector('.star-name').innerText;
+                const dLabel = item.querySelector('.dynamic-sh');
+                for (let key in hua) {
+                    if (hua[key] === sName) {
+                        dLabel.innerText = key;
+                        dLabel.style.display = 'block';
+                        dLabel.className = 'dynamic-sh ' + {"祿":"sh-lu","權":"sh-quan","科":"sh-ke","忌":"sh-ji"}[key];
+                    }
+                }
+            });
+            currentSelectedZhi = zhi;
         }
     }
 
+    function addStar(zhi, starName, sihuaType = null, orderWeight = 9) {
+        const container = document.querySelector(`#cell-${zhi} .star-container`);
+        if (!container) return;
+        let shClass = sihuaType ? {"祿":"sh-lu","權":"sh-quan","科":"sh-ke","忌":"sh-ji"}[sihuaType] : "";
+        let shHtml = sihuaType ? `<span class="sh-label ${shClass}">${sihuaType}</span>` : "";
+        const starDiv = document.createElement('div');
+        starDiv.className = 'star-item';
+        starDiv.setAttribute('data-order', orderWeight);
+        starDiv.innerHTML = `<span class="star-name">${starName}</span>${shHtml}<span class="dynamic-sh"></span>`;
+        container.appendChild(starDiv);
+        Array.from(container.children).sort((a,b)=>a.getAttribute('data-order')-b.getAttribute('data-order')).forEach(n=>container.appendChild(n));
+    }
+
     function renderBoard() {
-        const gender = document.getElementById('gender').value;
-        if(!gender) return alert("請選擇性別");
-        
-        const birthOrder = parseInt(document.getElementById('birthOrder').value) || 1;
         const uName = document.getElementById('uName').value || "命主";
-        // ...其餘獲取日期、時間與 Lunar 轉換的原始代碼...
-
-        // 【雙胞胎核心修改點：宮位推移】
-        // 1. 先計算首胎命宮位置 (基於輸入的首胎時間)
-        // let firstMIdx = (2 + (month - 1) - hIdx + 12) % 12; 
-
-        // 2. 計算當前胎次命宮位置 (首胎位置逆撥，一胎撥一個宮位)
-        // let currentMIdx = (firstMIdx - (birthOrder - 1) + 12) % 12;
-
-        // 3. 在渲染 12 宮名稱時使用 currentMIdx
-        // ZHI.forEach((z, i) => {
-        //    const pName = PALACES[(currentMIdx - i + 12) % 12];
-        //    // 更新 DOM...
-        // });
-
-        // 4. 安星邏輯（紫微、天府、五行局等）請務必「固定」使用 firstMIdx 進行計算
-        // 這樣星曜位置就會保持不變，達成「星不動，宮位動」的排盤規則。
+        const dVal = document.getElementById('bDate').value;
+        const hIn = document.getElementById('bHour').value || "23";
+        const mIn = document.getElementById('bMin').value || "00";
+        const gender = document.querySelector('input[name="gender"]:checked').value;
+        const birthOrder = parseInt(document.getElementById('birthOrder').value) || 1;
+        
+        if(dVal.length!==8 || !gender) return alert("請正確輸入資料");
 
         document.getElementById('input-page').style.display = 'none';
         document.getElementById('result-page').style.display = 'block';
+
+        let y = parseInt(dVal.substr(0,4)), m = parseInt(dVal.substr(4,2)), d = parseInt(dVal.substr(6,2));
+        let solar = (document.getElementById('calType').value==='solar') ? Solar.fromYmd(y,m,d) : Lunar.fromYmd(y,m,d).getSolar();
+        let lunar = (document.getElementById('calType').value==='solar') ? Solar.fromYmd(y,m,d).getLunar() : Lunar.fromYmd(y,m,d);
+        let hIdx = Math.floor(((parseInt(hIn)+1)%24)/2);
+        let yearGan = lunar.getYearGan();
+        let curSiHua = SI_HUA[yearGan];
+
+        const wuHu = {"甲":"丙","己":"丙","乙":"戊","庚":"戊","丙":"庚","辛":"庚","丁":"壬","壬":"壬","戊":"甲","癸":"甲"};
+        let startGanIdx = GAN.indexOf(wuHu[yearGan]);
+        
+        ZHI.forEach((z, i) => {
+            const cell = document.getElementById('cell-'+z);
+            let gIdx = (startGanIdx + (i >= 2 ? i-2 : i+10)) % 10;
+            let currentGan = GAN[gIdx];
+            cell.innerHTML = `<div class="star-container"></div><span class="palace-name"></span><div class="limit-label"><span></span></div><span class="gan-zhi-label">${currentGan}<br>${z}</span>`;
+            if (currentGan === yearGan) {
+                const tag = document.createElement('div');
+                tag.className = 'origin-palace-tag'; tag.innerText = '來因宮';
+                cell.appendChild(tag);
+            }
+        });
+
+        let firstMIdx = (2 + (lunar.getMonth()-1) - hIdx + 12) % 12;
+        let currentMIdx = (firstMIdx - (birthOrder - 1) + 12) % 12;
+        for(let i=0; i<12; i++) {
+            document.getElementById('cell-'+ZHI[(currentMIdx - i + 12) % 12]).querySelector('.palace-name').innerText = PALACES[i];
+        }
+
+        let firstMGan = document.getElementById('cell-'+ZHI[firstMIdx]).querySelector('.gan-zhi-label').innerText.charAt(0);
+        let bureauNum = { "甲": [4,4,2,2,6,6,2,2,4,4,6,6], "己": [4,4,2,2,6,6,2,2,4,4,6,6], "乙": [6,6,5,5,2,2,5,5,6,6,2,2], "庚": [6,6,5,5,2,2,5,5,6,6,2,2], "丙": [5,5,3,3,4,4,3,3,5,5,4,4], "辛": [5,5,3,3,4,4,3,3,5,5,4,4], "丁": [2,2,4,4,5,5,4,4,2,2,5,5], "壬": [2,2,4,4,5,5,4,4,2,2,5,5], "戊": [3,3,6,6,3,3,6,6,3,3,6,6], "癸": [3,3,6,6,3,3,6,6,3,3,6,6] }[firstMGan][firstMIdx];
+        
+        let isYang = "甲丙戊庚壬".includes(yearGan);
+        let direction = ( (isYang && gender==="男") || (!isYang && gender==="女") ) ? 1 : -1;
+        let nowAge = Solar.fromDate(new Date()).getYear() - solar.getYear() + 1;
+        
+        for(let i=0; i<12; i++) {
+            let zIdx = (currentMIdx + (i * direction) + 12) % 12;
+            let startAge = bureauNum + (i * 10);
+            let labelDiv = document.querySelector(`#cell-${ZHI[zIdx]} .limit-label`);
+            labelDiv.querySelector('span').innerText = `${startAge} - ${startAge+9}`;
+            if(nowAge >= startAge && nowAge <= startAge+9) labelDiv.classList.add("limit-active");
+        }
+
+        let day = lunar.getDay();
+        let q = Math.ceil(day / bureauNum), r = (bureauNum * q) - day;
+        let zwIdx = ((r % 2 === 0 ? (2 + (q - 1) + r) : (2 + (q - 1) - r)) + 12) % 12;
+        ["紫微","天機","","太陽","武曲","天同","","", "廉貞"].forEach((s,i)=>{if(s)addStar(ZHI[(zwIdx-i+12)%12],s,Object.keys(curSiHua).find(k=>curSiHua[k]===s),1);});
+        let tfIdx = (4 - zwIdx + 12) % 12;
+        ["天府","太陰","貪狼","巨門","天相","天梁","七殺","","","","破軍"].forEach((s,i)=>{if(s)addStar(ZHI[(tfIdx+i)%12],s,Object.keys(curSiHua).find(k=>curSiHua[k]===s),2);});
+        const month = lunar.getMonth();
+        [{n:"左輔",z:(4+month-1)%12},{n:"右弼",z:(10-month+1+12)%12},{n:"文昌",z:(10-hIdx+12)%12},{n:"文曲",z:(4+hIdx)%12}].forEach(s=>{addStar(ZHI[s.z],s.n,Object.keys(curSiHua).find(k=>curSiHua[k]===s.n),3);});
+        const ky = {"甲":["丑","未"],"戊":["丑","未"],"庚":["丑","未"],"乙":["子","申"],"己":["子","申"],"丙":["亥","酉"],"丁":["亥","酉"],"壬":["卯","巳"],"癸":["卯","巳"],"辛":["午","寅"]}[yearGan];
+        addStar(ky[0],"天魁",null,3); addStar(ky[1],"天鉞",null,3);
+
+        document.getElementById('c-main').innerText = `${uName}  ${isYang?'陽':'陰'}${gender}  ${{2:"水二局",3:"木三局",4:"金四局",5:"土五局",6:"火六局"}[bureauNum]}`;
+        document.getElementById('c-solar').innerHTML = `<span class="date-label">國曆</span> ${solar.getYear()}年${solar.getMonth()}月${solar.getDay()}日 ${hIn}:${mIn}`;
+        document.getElementById('c-lunar').innerHTML = `<span class="date-label">農曆</span> ${lunar.getYear()}年${lunar.getMonthInChinese()}月${lunar.getDayInChinese()} ${ZHI[hIdx]}時`;
     }
 </script>
 </body>
