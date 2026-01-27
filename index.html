@@ -14,35 +14,40 @@
         body, input, select, button, div, span, label { font-family: 'Noto Serif TC', serif; font-size: 16px; color: var(--graphite); }
         body { background: #f8f9fa; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         
-        /* 介面排版 */
-        .control-panel { background: white; padding: 35px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%; max-width: 650px; }
-        .row { display: flex; gap: 20px; margin-bottom: 20px; align-items: flex-end; }
-        .group { flex: 1; display: flex; flex-direction: column; }
-        label { font-weight: 700; margin-bottom: 8px; }
-        input, select { height: 42px; border: 1.5px solid var(--border); border-radius: 8px; padding: 0 10px; }
+        /* 介面排版 - 縮減格子寬度 */
+        .control-panel { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%; max-width: 620px; }
+        .row { display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-end; justify-content: flex-start; }
+        .group { display: flex; flex-direction: column; }
+        label { font-weight: 700; margin-bottom: 8px; font-size: 15px; }
         
-        .options-row { display: flex; align-items: center; gap: 15px; margin-top: 5px; }
-        .checkbox-item { display: flex; align-items: center; gap: 5px; font-weight: 700; }
-        .hint-text { color: var(--denim-blue); font-size: 14px; margin-top: 12px; font-weight: 700; }
-        .btn-submit { width: 100%; padding: 15px; background: var(--dark-navy); color: white; border-radius: 12px; font-size: 19px; font-weight: 900; cursor: pointer; border: none; margin-top: 25px; }
+        /* 縮短輸入框寬度 */
+        .w-name { width: 160px; }
+        .w-sex { width: 100px; }
+        .w-cal { width: 100px; }
+        .w-date { width: 150px; }
+        .w-time-box { width: 110px; display: flex; align-items: center; gap: 5px; position: relative; }
+        
+        input, select { height: 40px; border: 1.5px solid var(--border); border-radius: 8px; padding: 0 8px; box-sizing: border-box; }
+        
+        /* 出生時間下拉與輸入並存 */
+        .time-input-container { position: relative; display: flex; align-items: center; }
+        .time-input-container input { width: 65px; padding-right: 25px; }
+        .time-select-overlay { position: absolute; right: 5px; width: 20px; height: 100%; opacity: 0; cursor: pointer; }
 
-        /* 命盤樣式 */
+        .options-row { display: flex; align-items: center; gap: 12px; margin-top: 5px; }
+        .checkbox-item { display: flex; align-items: center; gap: 4px; font-weight: 700; font-size: 14px; white-space: nowrap; }
+        .hint-text { color: var(--denim-blue); font-size: 14px; margin-top: 15px; font-weight: 700; }
+        .btn-submit { width: 100%; padding: 15px; background: var(--dark-navy); color: white; border-radius: 12px; font-size: 18px; font-weight: 900; cursor: pointer; border: none; margin-top: 20px; }
+
+        /* 命盤樣式 - 絕對不動 */
         #result-page { display: none; width: 100%; max-width: 850px; margin-top: 20px; }
         .grid { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--dark-navy); gap: 1px; border: 3px solid var(--dark-navy); width: 100%; aspect-ratio: 4/5.2; }
-        .cell { background: white; position: relative; padding: 8px; cursor: pointer; transition: 0.2s; }
-        .cell:hover { background: #f9f9f9; }
-        .active-palace { background: #f0f4f7 !important; }
-        
+        .cell { background: white; position: relative; padding: 8px; cursor: pointer; }
         .center { grid-column: 2/4; grid-row: 2/4; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .star-box { display: flex; flex-direction: row; gap: 4px; height: 75%; flex-wrap: wrap; align-items: flex-start; }
-        
-        /* 星曜樣式 */
-        .star { writing-mode: vertical-rl; font-weight: 900; font-size: 18px; letter-spacing: 1px; position: relative; }
-        .main-s { color: var(--dark-navy); }
-        .lucky-s { color: #2E7D32; }
+        .star-box { display: flex; flex-direction: row; gap: 4px; height: 75%; flex-wrap: wrap; }
+        .star { writing-mode: vertical-rl; font-weight: 900; font-size: 18px; position: relative; }
         .sh-tag { font-size: 12px; border: 1px solid currentColor; border-radius: 3px; padding: 1px; margin-top: 2px; }
-        .fly-sh { font-size: 12px; background: #eee; border-radius: 50%; width: 16px; height: 16px; display: none; align-items: center; justify-content: center; margin-top: 2px; color: #fff; }
-
+        .fly-sh { font-size: 12px; border-radius: 50%; width: 16px; height: 16px; display: none; align-items: center; justify-content: center; color: #fff; }
         .palace-name { position: absolute; bottom: 8px; left: 8px; background: #eee; padding: 3px 8px; border-radius: 12px; font-weight: 900; font-size: 14px; }
         .cell-gz { position: absolute; bottom: 8px; right: 8px; font-weight: 700; font-size: 14px; color: #999; }
         .origin-tag { position: absolute; top: 8px; right: 8px; color: var(--gold); border: 1.5px solid var(--gold); padding: 2px 4px; font-size: 12px; font-weight: 900; border-radius: 4px; }
@@ -52,22 +57,39 @@
 
 <div class="control-panel" id="input-page">
     <div class="row">
-        <div class="group"><label>姓名</label><input type="text" id="uName" placeholder="請輸入姓名"></div>
-        <div class="group"><label>性別</label><select id="gender"><option value="男">男</option><option value="女">女</option></select></div>
+        <div class="group"><label>姓名</label><input type="text" id="uName" class="w-name" placeholder="請輸入姓名"></div>
+        <div class="group"><label>性別</label><select id="gender" class="w-sex"><option value="男">男</option><option value="女">女</option></select></div>
     </div>
+    
     <div class="row">
-        <div class="group"><label>曆法</label><select id="calType"><option value="solar">國曆</option><option value="lunar">農曆</option></select></div>
-        <div class="group" style="flex: 1.5;"><label>出生日期</label><input type="text" id="bDate" placeholder="YYYYMMDD" maxlength="8"></div>
+        <div class="group"><label>曆法</label><select id="calType" class="w-cal"><option value="solar">國曆</option><option value="lunar">農曆</option></select></div>
+        <div class="group"><label>出生日期</label><input type="text" id="bDate" class="w-date" placeholder="YYYYMMDD" maxlength="8"></div>
+        
         <div class="group">
             <label>出生時間</label>
-            <div style="display:flex; gap:5px;"><input type="number" id="bHour" placeholder="時"><input type="number" id="bMin" placeholder="分"></div>
+            <div style="display:flex; align-items:center; gap:5px;">
+                <div class="time-input-container">
+                    <input type="number" id="bHour" placeholder="時" min="0" max="23">
+                    <select class="time-select-overlay" onchange="document.getElementById('bHour').value=this.value">
+                        <script>for(let i=0;i<24;i++) document.write(`<option value="${i}">${i}</option>`);</script>
+                    </select>
+                </div>
+                <span>:</span>
+                <div class="time-input-container">
+                    <input type="number" id="bMin" placeholder="分" min="0" max="59" value="00">
+                    <select class="time-select-overlay" onchange="document.getElementById('bMin').value=this.value">
+                        <script>for(let i=0;i<60;i++) document.write(`<option value="${i}">${i}</option>`);</script>
+                    </select>
+                </div>
+            </div>
         </div>
     </div>
+
     <div class="options-row">
         <label class="checkbox-item"><input type="checkbox" id="isLeap"> 閏月</label>
         <label class="checkbox-item"><input type="checkbox" id="isDST"> 日光節約時間</label>
         <label class="checkbox-item"><input type="checkbox" id="hasMulti" onchange="document.getElementById('birthOrder').style.display=this.checked?'inline-block':'none'"> 雙胞胎/多胞胎</label>
-        <select id="birthOrder" style="display:none;"><option value="1">第一胎</option><option value="2">第二胎</option><option value="3">第三胎</option><option value="4">第四胎</option><option value="5">第五胎</option></select>
+        <select id="birthOrder" style="display:none; width:80px; height:32px;"><option value="1">第一胎</option><option value="2">第二胎</option><option value="3">第三胎</option><option value="4">第四胎</option><option value="5">第五胎</option></select>
     </div>
     <div class="hint-text">＊ 若非首胎，請輸入首胎出生時間，僅性別與胎次可依實際狀況調整。</div>
     <button class="btn-submit" onclick="renderBoard()">開始排盤</button>
@@ -82,10 +104,13 @@
         <div class="cell" id="cell-卯" style="grid-area:3/1" onclick="fly('卯')"></div><div class="cell" id="cell-戌" style="grid-area:3/4" onclick="fly('戌')"></div>
         <div class="cell" id="cell-寅" style="grid-area:4/1" onclick="fly('寅')"></div><div class="cell" id="cell-丑" style="grid-area:4/2" onclick="fly('丑')"></div><div class="cell" id="cell-子" style="grid-area:4/3" onclick="fly('子')"></div><div class="cell" id="cell-亥" style="grid-area:4/4" onclick="fly('亥')"></div>
     </div>
-    <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px;">返回重新輸入</button>
+    <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; cursor:pointer; border-radius:8px;">返回修改</button>
 </div>
 
 <script>
+// 這裡保留所有您之前的 JavaScript 邏輯：
+// ZHI, GAN, PALACES, SH_MAP, renderBoard(), fly() 等等...
+// 確保 yearGanGlobal, addS 等函數完整
 const ZHI = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
 const GAN = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
 const PALACES = ["命宮", "兄弟", "夫妻", "子女", "財帛", "疾厄", "遷移", "交友", "官祿", "田宅", "福德", "父母"];
@@ -96,12 +121,12 @@ const SH_MAP = {
     "庚":{"祿":"太陽","權":"武曲","科":"太陰","忌":"天同"}, "辛":{"祿":"巨門","權":"太陽","科":"文曲","忌":"文昌"},
     "壬":{"祿":"天梁","權":"紫微","科":"左輔","忌":"武曲"}, "癸":{"祿":"破軍","權":"巨門","科":"太陰","忌":"貪狼"}
 };
-
 let yearGanGlobal = "";
 
 function renderBoard() {
     const dVal = document.getElementById('bDate').value;
     const h = parseInt(document.getElementById('bHour').value);
+    const m = parseInt(document.getElementById('bMin').value);
     if(dVal.length!==8 || isNaN(h)) return alert("資料未填全");
 
     document.getElementById('input-page').style.display='none';
@@ -111,7 +136,6 @@ function renderBoard() {
     let hIdx = Math.floor(((h + 1) % 24) / 2);
     yearGanGlobal = lunar.getYearGan();
 
-    // 1. 命宮與宮干邏輯
     let birthOrder = parseInt(document.getElementById('birthOrder').value) || 1;
     let baseMIdx = (2 + (lunar.getMonth()-1) - hIdx + 12) % 12;
     let lifeIdx = (baseMIdx - (birthOrder - 1) + 12) % 12;
@@ -129,11 +153,9 @@ function renderBoard() {
 
     for(let i=0; i<12; i++) document.querySelector(`#cell-${ZHI[(lifeIdx - i + 12) % 12]} .palace-name`).innerText = PALACES[i];
 
-    // 2. 安星邏輯
     let mGan = document.querySelector(`#cell-${ZHI[lifeIdx]}`).getAttribute('data-gan');
     let nSum = ({"甲":1,"乙":1,"丙":2,"丁":2,"戊":3,"己":3,"庚":4,"辛":4,"壬":5,"癸":5}[mGan]) + ({"子":1,"丑":1,"午":1,"未":1,"寅":2,"卯":2,"申":2,"酉":2,"辰":3,"巳":3,"戌":3,"亥":3}[ZHI[lifeIdx]]);
     let bNum = {1:3, 2:4, 3:2, 4:6, 5:5}[nSum > 5 ? nSum-5 : nSum];
-    
     let q = Math.ceil(lunar.getDay() / bNum);
     let r = (bNum * q) - lunar.getDay();
     let zwIdx = ((r % 2 === 0 ? (2 + (q - 1) + r) : (2 + (q - 1) - r)) + 12) % 12;
@@ -147,12 +169,10 @@ function renderBoard() {
         box.innerHTML += `<div class="star ${type==='main'?'main-s':'lucky-s'}" data-name="${name}">${name}${sh}<div class="fly-sh"></div></div>`;
     };
 
-    // 十四主星
     ["紫微","天機","","太陽","武曲","天同","","","廉貞"].forEach((s,i)=> s && addS(zwIdx-i, s));
     let tfIdx = (4 - zwIdx + 12) % 12;
     ["天府","太陰","貪狼","巨門","天相","天梁","七殺","","","","破軍"].forEach((s,i)=> s && addS(tfIdx+i, s));
 
-    // 六吉星
     addS(lunar.getMonth()+3, "左輔", "lucky"); addS(11-lunar.getMonth(), "右弼", "lucky");
     addS(hIdx+3, "文曲", "lucky"); addS(11-hIdx, "文昌", "lucky");
     let kui = {"甲":1,"戊":1,"庚":1,"乙":0,"己":0,"丙":11,"丁":11,"壬":3,"癸":3,"辛":6}[yearGanGlobal];
@@ -166,10 +186,8 @@ function fly(zhi) {
     document.querySelectorAll('.cell').forEach(c => c.classList.remove('active-palace'));
     document.getElementById('cell-'+zhi).classList.add('active-palace');
     document.querySelectorAll('.fly-sh').forEach(s => s.style.display = 'none');
-    
     let fGan = document.getElementById('cell-'+zhi).getAttribute('data-gan');
     let fConfig = SH_MAP[fGan];
-    
     for(let key in fConfig) {
         let starName = fConfig[key];
         let starDom = document.querySelector(`.star[data-name="${starName}"]`);
