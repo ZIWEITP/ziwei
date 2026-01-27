@@ -9,35 +9,35 @@
     <style>
         :root { 
             --graphite-gray: #4A4E52; --morandi-denim-blue: #5E6D79; --morandi-light-blue: #7A8A99; 
-            --dark-navy-grey: #3A4652; --morandi-lotus: #C2A59F; --palace-bg: #E8E8E8; --origin-gold: #FFD700;
+            --dark-navy-grey: #3A4652; --palace-bg: #E8E8E8; --origin-gold: #FFD700;
             --color-lu: #2E7D32; --color-quan: #7B1FA2; --color-ke: #1976D2; --color-ji: #C62828;
-            --input-rounded: 12px;
+            --input-rounded: 15px;
         }
         body { background: #f4f6f8; margin: 0; padding: 0; font-family: 'Noto Serif TC', serif; }
         .page { width: 100%; display: flex; flex-direction: column; align-items: center; padding: 40px 15px; box-sizing: border-box; }
         
-        /* 恢復截圖輸入區塊 */
-        .control-panel { background: white; padding: 40px; border-radius: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%; max-width: 550px; box-sizing: border-box; }
+        /* 嚴格還原截圖樣式 */
+        .control-panel { background: white; padding: 40px; border-radius: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%; max-width: 550px; box-sizing: border-box; overflow: hidden; }
         .input-row { display: flex; gap: 20px; margin-bottom: 25px; align-items: flex-end; }
-        .input-group { display: flex; flex-direction: column; flex: 1; }
+        .input-group { display: flex; flex-direction: column; flex: 1; min-width: 0; }
         .input-group label { font-weight: 700; margin-bottom: 12px; color: var(--graphite-gray); font-size: 18px; }
-        input, select { height: 55px; padding: 0 20px; border: 1.5px solid #eee; border-radius: var(--input-rounded); font-size: 17px; background: #fff; outline: none; }
+        input, select { height: 55px; padding: 0 20px; border: 1.5px solid #eee; border-radius: var(--input-rounded); font-size: 17px; background: #fff; outline: none; width: 100%; box-sizing: border-box; }
         
-        /* 性別選擇器 */
-        .gender-container { display: flex; gap: 10px; height: 55px; }
+        .gender-container { display: flex; gap: 10px; height: 55px; width: 100%; }
         .gender-option { flex: 1; position: relative; }
         .gender-option input { position: absolute; opacity: 0; width: 0; height: 0; }
         .gender-label { display: flex; align-items: center; justify-content: center; height: 100%; border: 1.5px solid #eee; border-radius: var(--input-rounded); cursor: pointer; font-weight: 700; color: #999; }
         .gender-option input:checked + .gender-label { border-color: var(--morandi-denim-blue); background: var(--morandi-denim-blue); color: white; }
         
-        /* 時間預設樣式 */
-        .time-wrapper { display: flex; gap: 12px; align-items: center; }
-        .time-wrapper input { flex: 1; text-align: center; color: #BBB; }
+        /* 時間輸入區修正：確保不溢出 */
+        .time-wrapper { display: flex; gap: 10px; align-items: center; width: 100%; }
+        .time-wrapper input { flex: 1; text-align: center; color: #BBB; min-width: 0; }
         .time-wrapper input:focus, .time-wrapper input.has-val { color: var(--graphite-gray); }
 
-        .checkbox-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-weight: 700; color: var(--graphite-gray); }
+        .checkbox-row { display: flex; align-items: center; gap: 10px; margin: 15px 0; font-weight: 700; color: var(--graphite-gray); cursor: pointer; }
+        .checkbox-row input { width: 18px; height: 18px; margin: 0; }
 
-        .btn-start { display: block; width: 100%; max-width: 280px; margin: 40px auto 0; padding: 18px; background: var(--dark-navy-grey); color: white; border: none; border-radius: 15px; font-size: 20px; font-weight: 900; cursor: pointer; }
+        .btn-start { display: block; width: 100%; max-width: 280px; margin: 30px auto 0; padding: 18px; background: var(--dark-navy-grey); color: white; border: none; border-radius: 15px; font-size: 20px; font-weight: 900; cursor: pointer; }
 
         /* 排盤頁面樣式 */
         #result-page { display: none; padding: 20px 0; }
@@ -50,14 +50,13 @@
         .star-box { display: flex; flex-direction: column; align-items: center; width: 22px; position: relative; }
         .star-name { font-size: 18px; font-weight: 900; writing-mode: vertical-rl; color: var(--graphite-gray); letter-spacing: 2px; }
         
-        /* 生年四化 (實心無框) */
         .birth-hua { font-size: 18px; font-weight: 900; writing-mode: vertical-rl; margin-top: 2px; }
         .birth-hua.lu { color: var(--color-lu); }
         .birth-hua.quan { color: var(--color-quan); }
         .birth-hua.ke { color: var(--color-ke); }
         .birth-hua.ji { color: var(--color-ji); }
 
-        /* 宮干飛化 (加框且僅顯示化星字樣) */
+        /* 僅顯示加框的四化星字樣 */
         .fly-label { font-size: 14px; font-weight: 900; writing-mode: vertical-rl; padding: 4px 0; margin-top: 4px; border: 1.5px solid; border-radius: 4px; white-space: nowrap; line-height: 1; background: #fff; }
         .fly-label.lu { color: var(--color-lu); border-color: var(--color-lu); }
         .fly-label.quan { color: var(--color-quan); border-color: var(--color-quan); }
@@ -74,36 +73,50 @@
 <div id="input-page" class="page">
     <div class="control-panel">
         <div class="input-row">
-            <div class="input-group"><label>姓名</label><input type="text" id="uName" placeholder="輸入姓名"></div>
-            <div class="input-group"><label>性別</label>
+            <div class="input-group">
+                <label>姓名</label>
+                <input type="text" id="uName" placeholder="輸入姓名">
+            </div>
+            <div class="input-group">
+                <label>性別</label>
                 <div class="gender-container">
                     <label class="gender-option"><input type="radio" name="gender" value="男" checked><span class="gender-label">男</span></label>
                     <label class="gender-option"><input type="radio" name="gender" value="女"><span class="gender-label">女</span></label>
                 </div>
             </div>
         </div>
+        
         <div class="input-row">
-            <div class="input-group"><label>曆法</label><select id="calType"><option value="solar">國曆</option><option value="lunar">農曆</option></select></div>
-            <div class="input-group" style="flex: 1.5;"><label>出生日期</label><input type="text" id="bDate" maxlength="8" placeholder="YYYYMMDD"></div>
-        </div>
-        <div class="input-row">
-            <div class="input-group"><label>出生時間</label>
-                <div class="time-wrapper">
-                    <input type="text" id="bHour" value="00" oninput="this.classList.add('has-val')" onfocus="if(this.value=='00')this.value=''">
-                    <span style="font-weight:900; font-size: 20px;">:</span>
-                    <input type="text" id="bMin" value="00" oninput="this.classList.add('has-val')" onfocus="if(this.value=='00')this.value=''">
-                </div>
+            <div class="input-group">
+                <label>曆法</label>
+                <select id="calType"><option value="solar">國曆</option><option value="lunar">農曆</option></select>
+            </div>
+            <div class="input-group" style="flex: 1.5;">
+                <label>出生日期</label>
+                <input type="text" id="bDate" maxlength="8" placeholder="YYYYMMDD">
             </div>
         </div>
+
+        <div class="input-group" style="margin-bottom: 25px;">
+            <label>出生時間</label>
+            <div class="time-wrapper">
+                <input type="text" id="bHour" value="00" onfocus="if(this.value=='00')this.value=''" onblur="if(this.value=='')this.value='00'" oninput="this.classList.add('has-val')">
+                <span style="font-weight:900; font-size: 20px; color: #4A4E52;">:</span>
+                <input type="text" id="bMin" value="00" onfocus="if(this.value=='00')this.value=''" onblur="if(this.value=='')this.value='00'" oninput="this.classList.add('has-val')">
+            </div>
+        </div>
+
         <label class="checkbox-row">
             <input type="checkbox" id="hasMulti" onchange="document.getElementById('multi-box').style.display=this.checked?'block':'none'">
             <span>雙胞胎/多胞胎</span>
         </label>
-        <div id="multi-box" style="display:none; margin-top:15px;">
-            <select id="birthOrder" style="width:100%;">
+
+        <div id="multi-box" style="display:none; margin-bottom: 20px;">
+            <select id="birthOrder">
                 <option value="1">第一胎</option><option value="2">第二胎</option><option value="3">第三胎</option><option value="4">第四胎</option><option value="5">第五胎</option>
             </select>
         </div>
+
         <button class="btn-start" onclick="renderBoard()">開始排盤</button>
     </div>
 </div>
@@ -115,7 +128,7 @@
         <div class="cell" id="cell-未" onclick="handleFly(this, '未')" style="grid-area:1/3"></div>
         <div class="cell" id="cell-申" onclick="handleFly(this, '申')" style="grid-area:1/4"></div>
         <div class="cell" id="cell-辰" onclick="handleFly(this, '辰')" style="grid-area:2/1"></div>
-        <div class="center-box"><div id="c-info" style="text-align:center; font-weight:700; color:var(--morandi-lotus); font-size:15px;"></div></div>
+        <div class="center-box"><div id="c-info" style="text-align:center; font-weight:700; color:var(--morandi-lotus); font-size:15px; line-height:1.6;"></div></div>
         <div class="cell" id="cell-酉" onclick="handleFly(this, '酉')" style="grid-area:2/4"></div>
         <div class="cell" id="cell-卯" onclick="handleFly(this, '卯')" style="grid-area:3/1"></div>
         <div class="cell" id="cell-戌" onclick="handleFly(this, '戌')" style="grid-area:3/4"></div>
@@ -138,7 +151,9 @@
     let birthSiHuaStars = "";
 
     function addStar(zhi, name) {
-        const container = document.getElementById('cell-' + zhi).querySelector('.star-container');
+        const cell = document.getElementById('cell-' + zhi);
+        if(!cell) return;
+        const container = cell.querySelector('.star-container');
         let birthHuaHtml = "";
         for(let i=0; i<4; i++) {
             if(birthSiHuaStars.charAt(i) === name.charAt(0)) {
@@ -184,18 +199,17 @@
             cell.querySelector('.palace-name').innerText = PALACES[i].charAt(0);
         }
 
-        // 安星邏輯
         let ju = [2,6,3,5,4,2,6,3,5,4,2,6][mingIdx];
         let day = lunar.getDay();
         let q = Math.ceil(day/ju), r = (ju*q)-day;
         let zwIdx = (2 + (r % 2 === 0 ? (q - 1 + r) : (q - 1 - r)) + 12) % 12;
         ["紫微","天機","","太陽","武曲","天同","","", "廉貞"].forEach((s,i) => { if(s) addStar(ZHI[(zwIdx-i+12)%12], s); });
         let tfIdx = (2 + (2 - zwIdx + 12) % 12) % 12;
-        ["天府","太陰","貪狼","巨門","天相","天梁","七殺","","","","破軍"].forEach((s,i) => { if(s) addStar(ZHI[(tfIdx+i)%12], s); });
+        ["天府","太銀","貪狼","巨門","天相","天梁","七殺","","","","破軍"].forEach((s,i) => { if(s) addStar(ZHI[(tfIdx+i)%12], s); });
         addStar(ZHI[(4+(mIdx-1))%12], "左輔"); addStar(ZHI[(10-(mIdx-1)+12)%12], "右弼");
         addStar(ZHI[(10-hIdx+12)%12], "文昌"); addStar(ZHI[(4+hIdx)%12], "文曲");
         
-        document.getElementById('c-info').innerHTML = `${document.getElementById('uName').value || "命主"}<br>${lunar.toString()}`;
+        document.getElementById('c-info').innerHTML = `${document.getElementById('uName').value || "命主"}<br>${lunar.toString()}<br>${ZHI[hIdx]}時生`;
     }
 
     function handleFly(el, zhiName) {
@@ -206,17 +220,15 @@
         resetFly();
         el.classList.add('active-fly');
         currentFlyOrigin = zhiName;
-
         let gan = el.dataset.gan;
         let sh = SI_HUA_MAP[gan];
-
         ["祿","權","科","忌"].forEach((h, i) => {
             let starChar = sh.charAt(i);
             document.querySelectorAll('.star-box').forEach(box => {
                 if(box.dataset.sname.includes(starChar)) {
                     let flySpan = document.createElement('span');
                     flySpan.className = `fly-label ${HUA_CSS[i]}`;
-                    flySpan.innerText = h; // 僅顯示加框的四化星字樣
+                    flySpan.innerText = h;
                     box.appendChild(flySpan);
                 }
             });
