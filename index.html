@@ -9,12 +9,11 @@
     <style>
         :root { 
             --dark-navy: #3A4652; --slate-gray: #5E6D79; --gold: #B59356; 
-            --placeholder: #CCCCCC; /* 淺灰色 Placeholder */
+            --placeholder: #CCCCCC; /* 淺灰色 */
             --lu: #2E7D32; --quan: #7B1FA2; --ke: #1976D2; --ji: #D32F2F;
         }
         body { background: #f4f6f8; font-family: 'Noto Serif TC', serif; margin: 0; display: flex; justify-content: center; padding: 40px 10px; }
         
-        /* 嚴格還原原始截圖 UI */
         .card { background: white; padding: 40px; border-radius: 40px; box-shadow: 0 15px 50px rgba(0,0,0,0.05); width: 100%; max-width: 650px; box-sizing: border-box; }
         .row { display: flex; gap: 20px; margin-bottom: 25px; }
         .col { flex: 1; display: flex; flex-direction: column; }
@@ -24,20 +23,21 @@
             height: 50px; border-radius: 12px; border: 1.5px solid #E5E5E5; 
             padding: 0 15px; font-size: 18px; font-family: 'Noto Serif TC'; outline: none; 
         }
-        input::placeholder { color: var(--placeholder); }
+        /* 確保 placeholder 顏色為淺灰色 */
+        input::placeholder { color: var(--placeholder); opacity: 1; }
         
-        /* 時間輸入：時 : 分 */
+        /* 出生時間並排 */
         .time-box { display: flex; align-items: center; gap: 10px; }
-        .time-box input { flex: 1; text-align: center; }
+        .time-box input { flex: 1; text-align: left; }
 
         .btn-main { width: 100%; height: 65px; background: var(--dark-navy); color: white; border: none; border-radius: 15px; font-size: 24px; font-weight: 900; cursor: pointer; margin-top: 30px; font-family: 'Noto Serif TC'; }
 
-        /* 選項區塊文字與順序 */
-        .options-group { display: flex; gap: 15px; margin: 20px 0; align-items: center; }
-        .check-item { display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 700; font-size: 17px; }
-        .check-item input { width: 18px; height: 18px; }
+        /* 選項排列與文字 */
+        .options-group { display: flex; gap: 20px; margin: 20px 0; align-items: center; }
+        .check-item { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 700; font-size: 18px; }
+        .check-item input { width: 20px; height: 20px; cursor: pointer; }
 
-        /* 命盤呈現區 */
+        /* 命盤 */
         #result { display: none; width: 96vw; max-width: 800px; }
         .grid { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--slate-gray); gap: 1px; border: 4px solid var(--slate-gray); aspect-ratio: 4/5.2; }
         .cell { background: white; position: relative; padding: 5px; cursor: pointer; display: flex; flex-direction: column; overflow: hidden; }
@@ -46,10 +46,10 @@
         .s-name { writing-mode: vertical-rl; font-weight: 700; font-size: 20px; letter-spacing: 2px; }
         .s-sh { writing-mode: vertical-rl; font-size: 15px; border: 1px solid currentColor; border-radius: 3px; margin-top: 3px; font-weight: 700; }
         .s-fly { display: none; writing-mode: vertical-rl; font-size: 15px; border: 1.5px solid currentColor; border-radius: 3px; margin-top: 3px; font-weight: 900; }
-        .p-name { position: absolute; bottom: 8px; left: 8px; width: 40px; height: 40px; background: #EEE; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; }
-        .gz-label { position: absolute; bottom: 8px; right: 8px; font-weight: 900; text-align: center; line-height: 1.1; font-size: 17px; }
-        .origin { position: absolute; top: 10px; right: 10px; writing-mode: vertical-rl; border: 1.2px solid var(--gold); color: var(--gold); padding: 4px 2px; border-radius: 15px; font-size: 13px; font-weight: 900; }
-        .center { grid-column: 2/4; grid-row: 2/4; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .p-name { position: absolute; bottom: 10px; left: 10px; width: 42px; height: 42px; background: #EEE; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; }
+        .gz-label { position: absolute; bottom: 10px; right: 10px; font-weight: 900; text-align: center; line-height: 1.1; font-size: 18px; }
+        .origin { position: absolute; top: 10px; right: 10px; writing-mode: vertical-rl; border: 1.5px solid var(--gold); color: var(--gold); padding: 5px 2px; border-radius: 20px; font-size: 14px; font-weight: 900; background: white; }
+        .center { grid-column: 2/4; grid-row: 2/4; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
     </style>
 </head>
 <body>
@@ -90,9 +90,9 @@
         <div class="cell" id="c5" onclick="fly('5')"></div><div class="cell" id="c6" onclick="fly('6')"></div><div class="cell" id="c7" onclick="fly('7')"></div><div class="cell" id="c8" onclick="fly('8')"></div>
         <div class="cell" id="c4" style="grid-area:2/1" onclick="fly('4')"></div>
         <div class="center">
-            <div style="font-size:22px; font-weight:900; color:var(--slate-gray); letter-spacing:3px;">唐朝宮廷研究院</div>
-            <div id="info-name" style="font-size:20px; font-weight:700; color:#C2A59F; margin-top:10px;"></div>
-            <div id="info-date" style="font-size:15px; color:var(--slate-gray); margin-top:5px; line-height:1.5;"></div>
+            <div style="font-size:24px; font-weight:900; color:var(--slate-gray); letter-spacing:4px;">唐朝宮廷研究院</div>
+            <div id="info-name" style="font-size:22px; font-weight:700; color:#C2A59F; margin-top:15px;"></div>
+            <div id="info-date" style="font-size:16px; color:var(--slate-gray); margin-top:10px; line-height:1.6;"></div>
         </div>
         <div class="cell" id="c9" style="grid-area:2/4" onclick="fly('9')"></div>
         <div class="cell" id="c3" style="grid-area:3/1" onclick="fly('3')"></div><div class="cell" id="c10" style="grid-area:3/4" onclick="fly('10')"></div>
@@ -137,7 +137,7 @@
         if(!sex) return alert("請選擇性別");
         const dVal = document.getElementById('date').value;
         let hh = parseInt(document.getElementById('hh').value);
-        if(dVal.length !== 8 || isNaN(hh)) return alert("請檢查日期與時間格式");
+        if(dVal.length !== 8 || isNaN(hh)) return alert("日期或時間格式錯誤");
 
         if(document.getElementById('isDST').checked) hh = (hh - 1 + 24) % 24;
         document.getElementById('setup').style.display = 'none';
