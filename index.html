@@ -19,7 +19,6 @@
         .input-group label { font-weight: 700; margin-bottom: 10px; color: var(--graphite-gray); font-size: 18px; }
         input, select { height: 50px; padding: 0 15px; border: 1.5px solid #eee; border-radius: 12px; font-size: 17px; background: #fff; outline: none; box-sizing: border-box; }
         
-        /* 淺灰色預設值樣式 */
         .time-input { color: #BBB; }
         .time-input:focus { color: var(--graphite-gray); }
 
@@ -149,6 +148,7 @@
         document.getElementById('input-page').style.display='none';
         document.getElementById('result-page').style.display='block';
 
+        // 1. 宮位天干
         const wuHu = {"甲":"丙","己":"丙","乙":"戊","庚":"戊","丙":"庚","辛":"庚","丁":"壬","壬":"壬","戊":"甲","癸":"甲"};
         let yearGan = lunar.getYearGan();
         let startGanIdx = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"].indexOf(wuHu[yearGan]);
@@ -161,6 +161,7 @@
             if(g === yearGan) cell.innerHTML += `<div class="origin-palace-tag">來因宮</div>`;
         });
 
+        // 2. 安命宮與宮名
         let mIdx = lunar.getMonth();
         let mingZhiIdx = (2 + (mIdx - 1) - hIdx + 12) % 12;
         mingZhiIdx = (mingZhiIdx - (order - 1) + 12) % 12;
@@ -172,19 +173,26 @@
             c.dataset.pname = PALACES[i];
         }
 
+        // 3. 安主星
         let juNum = [2,6,3,5,4,2,6,3,5,4,2,6][mingZhiIdx];
         let day = lunar.getDay();
         let q = Math.ceil(day/juNum), r = (juNum*q)-day;
         let zwIdx = (2 + (r % 2 === 0 ? (q - 1 + r) : (q - 1 - r)) + 12) % 12;
 
         ["紫微","天機","","太陽","武曲","天同","","", "廉貞"].forEach((s,i) => { if(s) addStar(ZHI[(zwIdx-i+12)%12], s); });
-        let tfIdx = (4 - zwIdx + 12) % 12;
+        let tfIdx = (2 + (2 - zwIdx + 12) % 12) % 12;
         ["天府","太陰","貪狼","巨門","天相","天梁","七殺","","","","破軍"].forEach((s,i) => { if(s) addStar(ZHI[(tfIdx+i)%12], s); });
         
-        addStar(ZHI[(2+(mIdx-1))%12], "左輔");
-        addStar(ZHI[(10-(mIdx-1)+12)%12], "右弼");
-        addStar(ZHI[(10-hIdx+12)%12], "文昌");
-        addStar(ZHI[(4+hIdx)%12], "文曲");
+        // 4. 安六吉星 (修正邏輯)
+        // 左輔：從辰宮(4)起正月順數
+        addStar(ZHI[(4 + (mIdx - 1)) % 12], "左輔");
+        // 右弼：從戌宮(10)起正月逆數
+        addStar(ZHI[(10 - (mIdx - 1) + 12) % 12], "右弼");
+        // 文昌：從戌宮(10)起子時逆數
+        addStar(ZHI[(10 - hIdx + 12) % 12], "文昌");
+        // 文曲：從辰宮(4)起子時順數
+        addStar(ZHI[(4 + hIdx) % 12], "文曲");
+        
         let kY = {"甲":[1,7],"乙":[0,8],"丙":[11,9],"丁":[11,9],"戊":[1,7],"己":[0,8],"庚":[1,9],"辛":[6,2],"壬":[3,5],"癸":[3,5]}[yearGan];
         addStar(ZHI[kY[0]], "天魁"); addStar(ZHI[kY[1]], "天鉞");
 
