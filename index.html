@@ -31,7 +31,7 @@
         .control-panel { 
             background: white; padding: 30px; border-radius: 24px; 
             box-shadow: 0 15px 35px rgba(0,0,0,0.08); 
-            width: 100%; max-width: 500px; box-sizing: border-box; 
+            width: 100%; max-width: 550px; box-sizing: border-box; 
         }
         
         .input-row { display: flex; gap: 15px; margin-bottom: 20px; width: 100%; align-items: flex-end; }
@@ -57,8 +57,12 @@
         .time-wrapper { display: flex; gap: 8px; align-items: center; }
         .time-wrapper input { text-align: center; flex: 1; }
 
-        .options-row { display: flex; flex-direction: row; align-items: center; gap: 15px; flex-wrap: wrap; width: 100%; margin-top: 10px; }
+        /* 修正：第三排選項與下拉選單強制橫向並排 */
+        .options-row { display: flex; flex-direction: row; align-items: center; gap: 15px; flex-wrap: nowrap; width: 100%; margin-top: 10px; }
         .checkbox-item { display: flex; flex-direction: row; align-items: center; gap: 6px; cursor: pointer; font-weight: 700; white-space: nowrap; font-size: 16px; }
+        
+        /* 修正：下拉選單維持在同一排，寬度自適應 */
+        #birthOrder { width: auto; min-width: 100px; height: 38px; padding: 0 8px; font-size: 15px; }
         
         .multi-hint { color: var(--morandi-denim-blue); font-size: 14px; margin-top: 15px; width: 100%; font-weight: 400; line-height: 1.6; display: none; }
         
@@ -92,19 +96,15 @@
 
         @media (max-width: 480px) {
             .input-row { flex-direction: column; align-items: flex-start; gap: 15px; }
-            .input-group { width: 100%; }
+            .options-row { flex-wrap: wrap; }
             .star-name { font-size: 15px; letter-spacing: 1px; }
             .sh-label { font-size: 15px; }
             .dynamic-sh { font-size: 13px; }
             .palace-name { width: 28px; height: 28px; font-size: 15px; bottom: 3%; left: 3%; }
             .gan-zhi-label { font-size: 15px; bottom: 3%; right: 3%; }
-            .limit-label span { font-size: 12px; padding: 1px 4px; }
-            .origin-palace-tag { font-size: 12px; top: 5px; right: 5px; padding: 4px 2px; }
-            .c-title { font-size: 18px; letter-spacing: 2px; margin-bottom: 10px; }
-            .c-main-info { font-size: 16px; margin-bottom: 8px; }
-            .c-date-info { font-size: 13px; width: 100%; justify-content: center; }
-            .date-label { width: 40px; }
-            .center-box { padding: 20px 5px 5px; }
+            .c-title { font-size: 18px; letter-spacing: 2px; }
+            .c-main-info { font-size: 16px; }
+            .c-date-info { font-size: 13px; width: 100%; }
         }
     </style>
 </head>
@@ -117,14 +117,8 @@
             <div class="input-group">
                 <label>性別</label>
                 <div class="gender-container">
-                    <label class="gender-option">
-                        <input type="radio" name="gender" value="男" checked>
-                        <span class="gender-label">男</span>
-                    </label>
-                    <label class="gender-option">
-                        <input type="radio" name="gender" value="女">
-                        <span class="gender-label">女</span>
-                    </label>
+                    <label class="gender-option"><input type="radio" name="gender" value="男" checked><span class="gender-label">男</span></label>
+                    <label class="gender-option"><input type="radio" name="gender" value="女"><span class="gender-label">女</span></label>
                 </div>
             </div>
         </div>
@@ -136,12 +130,12 @@
             <div class="input-group">
                 <label>出生時間</label>
                 <div class="time-wrapper">
-                    <input type="text" id="bHour" list="hour-options" placeholder="23" maxlength="2" style="color:#ccc">
+                    <input type="text" id="bHour" list="hour-options" placeholder="23" maxlength="2">
                     <datalist id="hour-options">
                         <script>for(let i=0; i<24; i++) document.write(`<option value="${i < 10 ? '0'+i : i}"></option>`);</script>
                     </datalist>
                     <span>:</span>
-                    <input type="text" id="bMin" list="min-options" placeholder="00" maxlength="2" style="color:#ccc">
+                    <input type="text" id="bMin" list="min-options" placeholder="00" maxlength="2">
                     <datalist id="min-options">
                         <script>for(let i=0; i<60; i++) document.write(`<option value="${i < 10 ? '0'+i : i}"></option>`);</script>
                     </datalist>
@@ -151,8 +145,8 @@
         <div class="options-row">
             <label class="checkbox-item"><input type="checkbox" id="isLeap" style="width:18px;height:18px;"> 閏月</label>
             <label class="checkbox-item"><input type="checkbox" id="isDST" style="width:18px;height:18px;"> 日光節約</label>
-            <label class="checkbox-item"><input type="checkbox" id="hasMulti" onchange="toggleMulti()" style="width:18px;height:18px;"> 雙胞胎/多胞胎</label>
-            <select id="birthOrder" style="display: none; width: 120px;">
+            <label class="checkbox-item"><input type="checkbox" id="hasMulti" onchange="toggleMulti()" style="width:18px;height:18px;"> 雙胞胎</label>
+            <select id="birthOrder" style="display: none;">
                 <option value="1">第一胎</option><option value="2">第二胎</option><option value="3">第三胎</option><option value="4">第四胎</option><option value="5">第五胎</option>
             </select>
         </div>
@@ -257,11 +251,9 @@
         let yearGan = lunar.getYearGan();
         let curSiHua = SI_HUA[yearGan];
 
-        // 1. 定命宮位置與天干 (計算五行局基礎)
         let baseMIdx = (2 + (lunar.getMonth()-1) - hIdx + 12) % 12;
         let lifeIdx = (baseMIdx - (birthOrder - 1) + 12) % 12;
 
-        // 五虎遁定天干
         const wuHu = {"甲":2,"己":2,"乙":4,"庚":4,"丙":6,"辛":6,"丁":8,"壬":8,"戊":0,"癸":0};
         let startGanIdx = wuHu[yearGan];
         
@@ -277,12 +269,10 @@
             }
         });
 
-        // 安宮職
         for(let i=0; i<12; i++) {
             document.getElementById('cell-'+ZHI[(lifeIdx - i + 12) % 12]).querySelector('.palace-name').innerText = PALACES[i];
         }
 
-        // 2. 自動判斷五行局 (納音法)
         let lifeCell = document.getElementById('cell-'+ZHI[lifeIdx]);
         let lGan = lifeCell.querySelector('.gan-zhi-label').innerText.charAt(0);
         let lZhi = ZHI[lifeIdx];
@@ -294,7 +284,6 @@
         const bureauMap = {1:3, 2:4, 3:2, 4:6, 5:5};
         let bureauNum = bureauMap[nSum];
 
-        // 大限
         let isYang = "甲丙戊庚壬".includes(yearGan);
         let direction = ( (isYang && gender==="男") || (!isYang && gender==="女") ) ? 1 : -1;
         let nowAge = Solar.fromDate(new Date()).getYear() - solar.getYear() + 1;
@@ -306,13 +295,11 @@
             if(nowAge >= startAge && nowAge <= startAge+9) labelDiv.classList.add("limit-active");
         }
 
-        // 3. 紫微星定位 (通用公式)
         let day = lunar.getDay();
         let q = Math.ceil(day / bureauNum);
         let r = (bureauNum * q) - day;
         let zwIdx = ((r % 2 === 0 ? (2 + (q - 1) + r) : (2 + (q - 1) - r)) + 12) % 12;
 
-        // 布星
         ["紫微","天機","","太陽","武曲","天同","","", "廉貞"].forEach((s,i)=>{if(s)addStar(ZHI[(zwIdx-i+12)%12],s,Object.keys(curSiHua).find(k=>curSiHua[k]===s),1);});
         let tfIdx = (4 - zwIdx + 12) % 12;
         ["天府","太陰","貪狼","巨門","天相","天梁","七殺","","","","破軍"].forEach((s,i)=>{if(s)addStar(ZHI[(tfIdx+i)%12],s,Object.keys(curSiHua).find(k=>curSiHua[k]===s),2);});
