@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
     <style>
         :root { 
-            --graphite-gray: #4A4E52; --morandi-denim-blue: #5E6D79; --morandi-light-blue: #7A8A88; 
+            --graphite-gray: #4A4E52; --morandi-denim-blue: #5E6D79; --morandi-light-blue: #7A8A99; 
             --dark-navy-grey: #3A4652; --palace-bg: #E8E8E8; --origin-gold: #FFD700;
             --color-lu: #2E7D32; --color-quan: #7B1FA2; --color-ke: #1976D2; --color-ji: #C62828;
             --input-rounded: 15px;
@@ -23,7 +23,7 @@
             box-sizing: border-box; 
         }
 
-        /* 標題設定：28px, 4px字距, 仿宋, 陰影 */
+        /* 標題設定：28px, 4px字距, 陰影 */
         .main-header { 
             text-align: center; font-size: 28px; color: var(--morandi-denim-blue); 
             margin-bottom: 35px; letter-spacing: 4px;
@@ -40,14 +40,13 @@
             font-size: 17px; background: #fff; outline: none; width: 100%; box-sizing: border-box; color: var(--graphite-gray);
         }
 
-        /* 性別選擇樣式 */
         .gender-container { display: flex; gap: 10px; height: 55px; width: 100%; }
         .gender-option { flex: 1; position: relative; }
         .gender-option input { position: absolute; opacity: 0; width: 0; height: 0; }
         .gender-label { display: flex; align-items: center; justify-content: center; height: 100%; border: 1.5px solid #eee; border-radius: var(--input-rounded); cursor: pointer; font-weight: 700; color: #999; }
         .gender-option input:checked + .gender-label { border-color: var(--morandi-denim-blue); background: var(--morandi-denim-blue); color: white; }
 
-        /* 選項排版修復：強制橫向，雙胞胎選單在右側 */
+        /* 修復選項位移：強制橫向，雙胞胎選單在右 */
         .options-fixed-row {
             display: flex; align-items: center; justify-content: flex-start;
             gap: 15px; margin: 25px 0; width: 100%; flex-wrap: nowrap;
@@ -60,7 +59,7 @@
         .checkbox-item input { width: 18px; height: 18px; margin: 0; }
         #birthOrder { height: 42px; padding: 0 10px; font-size: 15px; width: 110px; border-color: #ddd; display: none; margin-left: 5px; }
 
-        /* 提示詞：白色框、內容置中、全形空白 */
+        /* 提示詞樣式：白色框、內容置中、全形空白 */
         .hint-box { 
             background: white; border: 2.2px solid #eee; padding: 20px; 
             border-radius: 15px; margin-top: 15px; text-align: center;
@@ -70,28 +69,19 @@
 
         .btn-start { display: block; width: 100%; max-width: 280px; margin: 40px auto 0; padding: 18px; background: var(--dark-navy-grey); color: white; border: none; border-radius: 15px; font-size: 20px; font-weight: 900; cursor: pointer; }
 
-        /* 命盤結果樣式 */
+        /* 命盤樣式 */
         #result-page { display: none; padding: 20px 0; }
         .grid-container { display: grid; grid-template-columns: repeat(4, 1fr); width: 98vw; max-width: 800px; aspect-ratio: 4/5.2; background: var(--morandi-denim-blue); border: 4px solid var(--morandi-denim-blue); gap: 1px; margin: 0 auto; }
         .cell { background: #fff; position: relative; padding: 10px; box-sizing: border-box; display: flex; flex-direction: column; cursor: pointer; }
-        .cell.active-fly { background: #F0F4F8; transition: background 0.3s; }
+        .cell.active-fly { background: #F0F4F8; }
         .center-box { grid-column: 2 / 4; grid-row: 2 / 4; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        
         .star-container { display: flex; flex-direction: row; gap: 4px; height: 90%; align-items: flex-start; }
         .star-box { display: flex; flex-direction: column; align-items: center; width: 28px; position: relative; }
         .star-name { font-family: 'FangSong', serif; font-size: 20px; font-weight: 900; writing-mode: vertical-rl; color: var(--graphite-gray); letter-spacing: 1px; }
-        
-        /* 生年四化 (圓點) */
         .birth-hua { font-size: 18px; font-weight: 900; writing-mode: vertical-rl; margin-top: 2px; }
         .birth-hua.lu { color: var(--color-lu); } .birth-hua.quan { color: var(--color-quan); } .birth-hua.ke { color: var(--color-ke); } .birth-hua.ji { color: var(--color-ji); }
-        
-        /* 宮干飛星 (方框標籤) */
         .fly-label { font-size: 18px; font-weight: 900; writing-mode: vertical-rl; margin-top: 4px; border: 2.2px solid; border-radius: 4px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; background: #fff; box-sizing: border-box; line-height: 1; }
-        .fly-label.lu { color: var(--color-lu); border-color: var(--color-lu); }
-        .fly-label.quan { color: var(--color-quan); border-color: var(--color-quan); }
-        .fly-label.ke { color: var(--color-ke); border-color: var(--color-ke); }
-        .fly-label.ji { color: var(--color-ji); border-color: var(--color-ji); }
-
+        .fly-label.lu { color: var(--color-lu); border-color: var(--color-lu); } .fly-label.quan { color: var(--color-quan); border-color: var(--color-quan); } .fly-label.ke { color: var(--color-ke); border-color: var(--color-ke); } .fly-label.ji { color: var(--color-ji); border-color: var(--color-ji); }
         .palace-name { position: absolute; bottom: 8px; left: 8px; font-size: 17px; font-weight: 900; background: var(--palace-bg); width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
         .gan-zhi-label { position: absolute; bottom: 8px; right: 8px; font-size: 17px; font-weight: 900; color: var(--graphite-gray); text-align: right; }
     </style>
@@ -118,7 +108,7 @@
             <label>出生時間</label>
             <div style="display:flex; gap:10px; align-items:center;">
                 <input type="text" id="bHour" style="text-align:center; flex:1;" value="00">
-                <span style="font-weight:900; font-size: 20px;">:</span>
+                <span style="font-weight:900;">:</span>
                 <input type="text" id="bMin" style="text-align:center; flex:1;" value="00">
             </div>
         </div>
@@ -210,7 +200,6 @@
         const hIn = parseInt(document.getElementById('bHour').value) || 0;
         const gender = document.querySelector('input[name="gender"]:checked').value;
         const order = document.getElementById('hasMulti').checked ? parseInt(document.getElementById('birthOrder').value) : 1;
-        
         if(dVal.length !== 8) return alert("請輸入 8 位數日期");
 
         let lunar = (document.getElementById('calType').value === 'solar') 
