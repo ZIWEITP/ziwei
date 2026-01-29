@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q30CC6NVBQ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-Q30CC6NVBQ');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>唐朝宮廷紫微斗數排盤</title>
@@ -89,7 +98,6 @@
         .c-title { font-size: 26px; font-weight: 900; color: var(--morandi-light-blue); letter-spacing: 5px; margin-bottom: 22px; white-space: nowrap; }
         .c-main-info { font-size: 22px; font-weight: 700; color: var(--morandi-lotus); margin-bottom: 15px; }
         
-        /* 統一日期行的大小與間距 */
         .c-date-info { font-size: 13px; color: var(--morandi-green); margin: 2px 0; display: flex; align-items: center; font-weight: 400; }
         .date-label { flex-shrink: 0; }
 
@@ -105,7 +113,6 @@
             .origin-palace-tag { font-size: 12px; top: 5px; right: 5px; padding: 4px 2px; }
             .c-title { font-size: 18px; letter-spacing: 2px; margin-bottom: 10px; }
             .c-main-info { font-size: 16px; margin-bottom: 8px; }
-            /* 手機端統一縮小 */
             .c-date-info { font-size: 11px; }
             .center-box { padding: 20px 5px 5px; }
         }
@@ -249,6 +256,13 @@
         const birthOrder = parseInt(document.getElementById('birthOrder').value) || 1;
         
         if(dVal.length!==8 || !gender) return alert("請正確輸入資料");
+
+        // --- GA4 事件追蹤：開始排盤 ---
+        gtag('event', 'calculate_ziwei', {
+            'event_category': 'Engagement',
+            'event_label': '紫微排盤啟動',
+            'gender': gender
+        });
 
         document.getElementById('input-page').style.display = 'none';
         document.getElementById('result-page').style.display = 'block';
