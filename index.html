@@ -6,13 +6,12 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-Q30CC6NVBQ');
     </script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>唐朝宮廷紫微斗數排盤</title>
+    <title>宮廷命理研究院</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
     <style>
@@ -101,6 +100,32 @@
         .c-date-info { font-size: 13px; color: var(--morandi-green); margin: 2px 0; display: flex; align-items: center; font-weight: 400; }
         .date-label { flex-shrink: 0; }
 
+        /* 性格分析樣式修正 */
+        .personality-card {
+            max-width: 720px;
+            margin: 30px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            font-family: 'Noto Serif TC', serif;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+            box-sizing: border-box;
+        }
+        .personality-title {
+            font-size: 20px;
+            color: var(--morandi-denim-blue);
+            text-align: center;
+            letter-spacing: 4px;
+            font-weight: 900;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+        .trait-box { margin-bottom: 10px; }
+        .trait-label { font-size: 17px; font-weight: 700; display: block; margin-bottom: 8px; color: var(--morandi-gold); }
+        .trait-content { font-size: 16px; color: #666; line-height: 1.8; text-align: justify; }
+
         @media (max-width: 480px) {
             .input-row { flex-direction: column; align-items: flex-start; gap: 15px; }
             .input-group { width: 100%; }
@@ -115,6 +140,7 @@
             .c-main-info { font-size: 16px; margin-bottom: 8px; }
             .c-date-info { font-size: 11px; }
             .center-box { padding: 20px 5px 5px; }
+            .personality-card { margin: 20px 15px; padding: 20px; }
         }
     </style>
 </head>
@@ -148,12 +174,12 @@
                 <div class="time-wrapper">
                     <input type="text" id="bHour" list="hour-options" placeholder="00" maxlength="2">
                     <datalist id="hour-options">
-                        <script>for(let i=0; i<24; i++) document.write(`<option value="${i < 10 ? '0'+i : i}"></option>`);</script>
+                        <script>for(let i=0; i<23; i++) document.write(`<option value="${i < 10 ? '0'+i : i}"></option>`);</script>
                     </datalist>
                     <span>:</span>
                     <input type="text" id="bMin" list="min-options" placeholder="00" maxlength="2">
                     <datalist id="min-options">
-                        <script>for(let i=0; i<60; i++) document.write(`<option value="${i < 10 ? '0'+i : i}"></option>`);</script>
+                        <script>for(let i=0; i<59; i++) document.write(`<option value="${i < 10 ? '0'+i : i}"></option>`);</script>
                     </datalist>
                 </div>
             </div>
@@ -176,7 +202,7 @@
         <div class="cell" id="cell-巳" onclick="toggleSiHua('巳')"></div><div class="cell" id="cell-午" onclick="toggleSiHua('午')"></div><div class="cell" id="cell-未" onclick="toggleSiHua('未')"></div><div class="cell" id="cell-申" onclick="toggleSiHua('申')"></div>
         <div class="cell" id="cell-辰" style="grid-area:2/1" onclick="toggleSiHua('辰')"></div>
         <div class="center-box">
-            <div class="c-title">唐朝宮廷命理研究院</div>
+            <div class="c-title">宮廷命理研究院</div>
             <div id="c-main" class="c-main-info"></div>
             <div class="c-date-container">
                 <div id="c-solar" class="c-date-info"></div>
@@ -187,6 +213,9 @@
         <div class="cell" id="cell-卯" style="grid-area:3/1" onclick="toggleSiHua('卯')"></div><div class="cell" id="cell-戌" style="grid-area:3/4" onclick="toggleSiHua('戌')"></div>
         <div class="cell" id="cell-寅" style="grid-area:4/1" onclick="toggleSiHua('寅')"></div><div class="cell" id="cell-丑" style="grid-area:4/2" onclick="toggleSiHua('丑')"></div><div class="cell" id="cell-子" style="grid-area:4/3" onclick="toggleSiHua('子')"></div><div class="cell" id="cell-亥" style="grid-area:4/4" onclick="toggleSiHua('亥')"></div>
     </div>
+
+    <div id="personality-display"></div>
+
     <button class="btn-reset" onclick="location.reload()">返回重新輸入</button>
 </div>
 
@@ -195,6 +224,47 @@
     const GAN = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
     const PALACES = ["命", "兄", "夫", "子", "財", "疾", "遷", "友", "官", "田", "福", "父"];
     const SI_HUA = { "甲": { "祿": "廉貞", "權": "破軍", "科": "武曲", "忌": "太陽" }, "乙": { "祿": "天機", "權": "天梁", "科": "紫微", "忌": "太陰" }, "丙": { "祿": "天同", "權": "天機", "科": "文昌", "忌": "廉貞" }, "丁": { "祿": "太陰", "權": "天同", "科": "天機", "忌": "巨門" }, "戊": { "祿": "貪狼", "權": "太陰", "科": "右弼", "忌": "天機" }, "己": { "祿": "武曲", "權": "貪狼", "科": "天梁", "忌": "文曲" }, "庚": { "祿": "太陽", "權": "武曲", "科": "太陰", "忌": "天同" }, "辛": { "祿": "巨門", "權": "太陽", "科": "文曲", "忌": "文昌" }, "壬": { "祿": "天梁", "權": "紫微", "科": "左輔", "忌": "武曲" }, "癸": { "祿": "破軍", "權": "巨門", "科": "太陰", "忌": "貪狼" } };
+
+    const PERSONALITY_DATA = {
+        "紫微": "靈魂深處隱著一份不容妥協的傲骨。在寂靜中審視自我，擁有一種生而為王的自省與矜持；行止間如徐風拂柳，優雅自在。在人際流轉中，始終保持著一種高貴而疏離的儀態。",
+        "天機": "思緒如繁星交織，於靜謐中洞察萬物，內心世界是一場永不落幕的腦力辯論；眉宇間透著靈動，是個反應敏捷的智者，總能在混亂中精準捕捉邏輯的線條。",
+        "太陽": "心中藏著一團永恆燃燒的火焰，對卓越有著近乎偏執的渴求；似暖陽入室，熱情中帶著坦蕩與豪爽，讓人不自覺想向你的光芒靠攏。",
+        "武曲": "內核堅硬如鐵，在冷靜與剛毅之間，構築了一座不被情緒左右的堡壘；於世俗中果斷前行，不屑於無謂的爭執，以絕對的實力定義自己的存在。",
+        "天同": "內心是一汪柔軟的湖水，在生活的重壓下，仍試圖維持那份易碎的平和；擁有一顆純粹的赤子之心，生活節奏舒緩且天真，彷彿紅塵紛擾皆與己無關。",
+        "廉貞": "情感深處潛伏著強烈的佔有欲，如同一場濃郁且化不開的墨色；行為舉止中透著一股敢做敢當的英氣，生命底色是鮮明且不容塗抹的執著。",
+        "天府": "守著心中一方保守的舊城，在念舊與安穩中尋找歸屬感；不拘小節的灑脫之下，藏著對生活的包容，活得從容且不被細節束縛。",
+        "太陰": "靈魂如月光下的水影，優柔而敏感，在無盡的思慮中反覆擺盪；散發著一種貞潔且浪漫的氣息，安靜地在角落編織屬於自己的夢境。",
+        "貪狼": "慾望是內心深處的潮汐，隨波逐流中隱藏著對生命多樣性的渴求；行走在人群中是風流倜儻的風景，優雅地應對世間所有的繁華與誘惑。",
+        "巨門": "在多疑與猜忌的迷霧中穿行，對人性有著天然的防備與審視；言語犀利如刃，條理分明得近乎冷酷，總能一眼看穿事物的本質。",
+        "天相": "意志如隨風擺盪的蘆葦，在堅持與妥協之間尋找平衡的支點；舉止優雅如隨風逐留的雲朵，隨和的外表下，是極致的適應力。",
+        "天梁": "胸懷慈悲的長者之心，在自省中承載著對世界的悲憫；言談間帶著幾分老成持重，雖顯得有些嚴肅，卻是他人眼中最穩定的依靠。",
+        "七殺": "內心是一把出鞘的孤劍，剛烈而果決，不曾為任何阻礙停留；行俠仗義是命運的底色，以一種義無反顧的姿態，行走在自己的江湖。",
+        "破軍": "靈魂中躁動著反叛的因子，在求新求變的渴望中不斷自我毀滅與重生；膽大豪邁，是不折不扣的冒險家，敢於打破陳規去擁抱未知的荒野。",
+        "紫破": "在自我與反叛之間掙扎，有一種不甘於平庸的、叛逆的自尊；特立獨行，在人群中總是那個不經意間驚艷全座、喜出風頭的焦點。",
+        "紫府": "內心如孤傲的群山，自視甚高，在權力的邊緣感受孤僻的冷靜；雖不張揚卻自有威嚴，言語間流露出一種遺世獨立的孤芳自賞。",
+        "紫貪": "在物質的享受與靈魂的規訓間尋求平衡，內心藏著難以馴服的野性；隨性而行，喜好歌舞昇平的繁華，在世俗的歡愉中展現迷人的生命力。",
+        "紫相": "內心極度重視精神的體面，如同一位在神壇與凡塵間游走的信徒；極力維護自尊與表面的完滿，呈現出一種無懈可擊的精緻形象。",
+        "紫殺": "堅毅果敢的靈魂不願受任何枷鎖束縛，內在是一場永恆的突破；個性霸道而獨斷，在自己的世界裡，你是唯一的裁決者與執行者。",
+        "機陰": "多愁善感的情緒如影隨形，靈魂在感性的潮汐中隨心所欲地流動；處事按部就班，在溫柔體貼中隱藏著對人性最深沉的解讀。",
+        "機巨": "多疑的思緒與才華交織，內心是一座精密的迷宮，冷冽而傲然；抽絲剝繭地分析世間萬物，言談間條理分明，展現明辨是非的鋒芒。",
+        "機梁": "內心深處計較著因果與規律，對自己的聰明才智有著絕對的自信；言談間帶著幾分嘮叨的關懷，在投機與善良之間尋找生命的平衡點。",
+        "陽陰": "思慮如靈動的游魚，在忽陽忽陰的情緒邊界游走，難以捉摸；熱情體貼的外殼下，藏著一顆細膩卻又讓人難以完全靠近的靈魂。",
+        "陽巨": "自我主張強烈，在內心深處渴望透過某種形式的表達來確認自我價值；個性倔強且善於辭令，在言語的交鋒中展現不容忽視的存在感。",
+        "陽梁": "內心恐懼孤獨的侵蝕，寧願在慷慨與浪費中尋求片刻的喧囂；熱心腸的背後是一份難得的慈悲，在照亮他人的同時感受自我的重量。",
+        "武府": "對物質與權力的秩序有著近乎偏執的守護，內心深處藏著鋒利的現實；一旦認定目標便如箭在弦，以最務實的行動表達對世界的野心。",
+        "武貪": "在時刻的自我檢討與等待時機中，內心醞釀著對成功的渴望；重財亦重欲，在八方求財的奔波中，展現對生活最真實的執著。",
+        "武相": "擁有一種「寧為雞首」的清高，內心在權力的排序中極其敏感；外表柔和內在剛強，擅長在複雜的人際網中鋪陳出優雅的局勢。",
+        "武殺": "不達目的絕不甘休的執念，在靈魂深處刻下了冷酷的誓言；個性務實且乾淨俐落，從不拖泥帶水，行動力是你最強大的武裝。",
+        "武破": "內心藏著一場孤注一擲的豪賭，為了所愛或所信，甘願粉身碎骨；意志堅決且勇往直前，在毀滅與創造的循環中，尋找生命的出口。",
+        "同陰": "多情不定的靈魂不喜拘束，內心在感性的浪潮中反覆漂泊；平易近人卻也有些猶豫不定，在隨和中展現出一種朦朧的人格魅力。",
+        "同巨": "自以為是風流倜儻的過客，實則內心深處隱藏著不安的多疑；多疑心性與虛榮交織，在試圖引起注意的同時，又對世界保持戒心。",
+        "同梁": "性情隨和且暗藏精明，內心在守舊與開創間維持著微妙的平衡；察言觀色且善體人意，是個人際關係中的潤滑劑，處世圓融周到。",
+        "廉相": "自我矛盾的情感極其執著，內心是一場理智與感性的拉鋸戰；工作勤奮且愛情至上，在現實的責任與浪漫的渴望中展現極致的忠誠。",
+        "廉殺": "心多急躁且感情用事，內在是一股隨時可能噴發的火山能量；反應敏捷但個性急躁，以一種快節奏的姿態應對生命中的所有挑戰。",
+        "廉破": "脾氣暴躁且思想極端，內心深處燃燒著毀滅陳舊規則的烈火；個性急躁且以自我為中心，不屈從於權威，展現出強烈的個人色彩。",
+        "廉府": "功利主義與舊情感傷交織，內心在現實的獲取與回憶的沈溺中掙扎；主觀性強且有時缺乏理智，對生活有著明確的要求，不容他人置喙。",
+        "廉貪": "情感豐沛且冒險投機，內心是一場永不停歇的感官與情感的冒險；幽默風趣且不拘小節，散發著獨特的魅力，在人群中游任有餘。"
+    };
 
     let currentSelectedZhi = null;
 
@@ -256,13 +326,6 @@
         const birthOrder = parseInt(document.getElementById('birthOrder').value) || 1;
         
         if(dVal.length!==8 || !gender) return alert("請正確輸入資料");
-
-        // --- GA4 事件追蹤：開始排盤 ---
-        gtag('event', 'calculate_ziwei', {
-            'event_category': 'Engagement',
-            'event_label': '紫微排盤啟動',
-            'gender': gender
-        });
 
         document.getElementById('input-page').style.display = 'none';
         document.getElementById('result-page').style.display = 'block';
@@ -337,6 +400,37 @@
         document.getElementById('c-main').innerText = `${uName}  ${isYang?'陽':'陰'}${gender}  ${bureauNames[bureauNum]}`;
         document.getElementById('c-solar').innerHTML = `<span class="date-label">國曆</span>${solar.getYear()}年${solar.getMonth()}月${solar.getDay()}日 ${hIn}:${mIn}`;
         document.getElementById('c-lunar').innerHTML = `<span class="date-label">農曆</span>${lunar.getYearInGanZhi()}年${lunar.getMonthInChinese()}月${lunar.getDayInChinese()} ${ZHI[hIdx]}時`;
+
+        // --- 性格分析觸發邏輯 ---
+        let lifeZhi = ZHI[lifeIdx];
+        let oppZhi = ZHI[(lifeIdx + 6) % 12];
+        
+        function getStars(z) {
+            return Array.from(document.querySelectorAll(`#cell-${z} .star-name`)).map(el => el.innerText);
+        }
+
+        let mainStars = getStars(lifeZhi).filter(s => Object.keys(PERSONALITY_DATA).includes(s));
+        if (mainStars.length === 0) {
+            mainStars = getStars(oppZhi).filter(s => Object.keys(PERSONALITY_DATA).includes(s));
+        }
+
+        let resultHTML = "";
+        if (mainStars.length > 0) {
+            let comboKey = mainStars.length >= 2 ? mainStars[0].substring(0,1) + mainStars[1].substring(0,1) : "";
+            let finalKey = PERSONALITY_DATA[comboKey] ? comboKey : mainStars[0];
+            let content = PERSONALITY_DATA[finalKey];
+
+            resultHTML = `
+                <div class="personality-card">
+                    <div class="personality-title">性格簡易分析</div>
+                    <div class="trait-box">
+                        <span class="trait-label">特質</span>
+                        <div class="trait-content">${content}</div>
+                    </div>
+                </div>
+            `;
+        }
+        document.getElementById('personality-display').innerHTML = resultHTML;
     }
 </script>
 </body>
