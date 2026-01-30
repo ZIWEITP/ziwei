@@ -100,7 +100,7 @@
         .c-date-info { font-size: 13px; color: var(--morandi-green); margin: 2px 0; display: flex; align-items: center; font-weight: 400; }
         .date-label { flex-shrink: 0; }
 
-        /* 性格分析樣式修正 */
+        /* 性格分析樣式 */
         .personality-card {
             max-width: 720px;
             margin: 30px auto;
@@ -174,12 +174,12 @@
                 <div class="time-wrapper">
                     <input type="text" id="bHour" list="hour-options" placeholder="00" maxlength="2">
                     <datalist id="hour-options">
-                        <script>for(let i=0; i<23; i++) document.write(`<option value="${i < 10 ? '0'+i : i}"></option>`);</script>
+                        <script>for(let i=0; i<24; i++) document.write(`<option value="${i < 10 ? '0'+i : i}"></option>`);</script>
                     </datalist>
                     <span>:</span>
                     <input type="text" id="bMin" list="min-options" placeholder="00" maxlength="2">
                     <datalist id="min-options">
-                        <script>for(let i=0; i<59; i++) document.write(`<option value="${i < 10 ? '0'+i : i}"></option>`);</script>
+                        <script>for(let i=0; i<60; i++) document.write(`<option value="${i < 10 ? '0'+i : i}"></option>`);</script>
                     </datalist>
                 </div>
             </div>
@@ -260,7 +260,7 @@
         "同巨": "自以為是風流倜儻的過客，實則內心深處隱藏著不安的多疑；多疑心性與虛榮交織，在試圖引起注意的同時，又對世界保持戒心。",
         "同梁": "性情隨和且暗藏精明，內心在守舊與開創間維持著微妙的平衡；察言觀色且善體人意，是個人際關係中的潤滑劑，處世圓融周到。",
         "廉相": "自我矛盾的情感極其執著，內心是一場理智與感性的拉鋸戰；工作勤奮且愛情至上，在現實的責任與浪漫的渴望中展現極致的忠誠。",
-        "廉殺": "心多急躁且感情用事，內在是一股隨時可能噴發的火山能量；反應敏捷但個性急躁，以一種快節奏的姿態應對生命中的所有挑戰。",
+        "廉殺": "心多急躁且感情用事，內在是一股隨時可能噴發的火山能量；反應敏捷 but 個性急躁，以一種快節奏的姿態應對生命中的所有挑戰。",
         "廉破": "脾氣暴躁且思想極端，內心深處燃燒著毀滅陳舊規則的烈火；個性急躁且以自我為中心，不屈從於權威，展現出強烈的個人色彩。",
         "廉府": "功利主義與舊情感傷交織，內心在現實的獲取與回憶的沈溺中掙扎；主觀性強且有時缺乏理智，對生活有著明確的要求，不容他人置喙。",
         "廉貪": "情感豐沛且冒險投機，內心是一場永不停歇的感官與情感的冒險；幽默風趣且不拘小節，散發著獨特的魅力，在人群中游任有餘。"
@@ -402,33 +402,49 @@
         document.getElementById('c-lunar').innerHTML = `<span class="date-label">農曆</span>${lunar.getYearInGanZhi()}年${lunar.getMonthInChinese()}月${lunar.getDayInChinese()} ${ZHI[hIdx]}時`;
 
         // --- 性格分析觸發邏輯 ---
-        let lifeZhi = ZHI[lifeIdx];
-        let oppZhi = ZHI[(lifeIdx + 6) % 12];
+        const lifeZhi = ZHI[lifeIdx];
+        const oppZhi = ZHI[(lifeIdx + 6) % 12];
         
-        function getStars(z) {
+        function getStarsFromCell(z) {
             return Array.from(document.querySelectorAll(`#cell-${z} .star-name`)).map(el => el.innerText);
         }
 
-        let mainStars = getStars(lifeZhi).filter(s => Object.keys(PERSONALITY_DATA).includes(s));
-        if (mainStars.length === 0) {
-            mainStars = getStars(oppZhi).filter(s => Object.keys(PERSONALITY_DATA).includes(s));
-        }
+        const lifeStars = getStarsFromCell(lifeZhi).filter(s => PERSONALITY_DATA[s] || (s.length >= 2 && PERSONALITY_DATA[s.substring(0,1)]));
+        const oppStars = getStarsFromCell(oppZhi).filter(s => PERSONALITY_DATA[s] || (s.length >= 2 && PERSONALITY_DATA[s.substring(0,1)]));
+
+        const mainStars = lifeStars.length > 0 ? lifeStars : oppStars;
 
         let resultHTML = "";
         if (mainStars.length > 0) {
-            let comboKey = mainStars.length >= 2 ? mainStars[0].substring(0,1) + mainStars[1].substring(0,1) : "";
-            let finalKey = PERSONALITY_DATA[comboKey] ? comboKey : mainStars[0];
-            let content = PERSONALITY_DATA[finalKey];
+            let finalKey = "";
+            if (mainStars.length >= 2) {
+                const s1 = mainStars[0].substring(0,1);
+                const s2 = mainStars[1].substring(0,1);
+                const combo = s1 + s2;
+                const reverseCombo = s2 + s1;
+                if (PERSONALITY_DATA[combo]) {
+                    finalKey = combo;
+                } else if (PERSONALITY_DATA[reverseCombo]) {
+                    finalKey = reverseCombo;
+                } else {
+                    finalKey = mainStars[0];
+                }
+            } else {
+                finalKey = mainStars[0];
+            }
 
-            resultHTML = `
-                <div class="personality-card">
-                    <div class="personality-title">性格簡易分析</div>
-                    <div class="trait-box">
-                        <span class="trait-label">特質</span>
-                        <div class="trait-content">${content}</div>
+            const content = PERSONALITY_DATA[finalKey];
+            if (content) {
+                resultHTML = `
+                    <div class="personality-card">
+                        <div class="personality-title">性格簡易分析</div>
+                        <div class="trait-box">
+                            <span class="trait-label">特質</span>
+                            <div class="trait-content">${content}</div>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            }
         }
         document.getElementById('personality-display').innerHTML = resultHTML;
     }
